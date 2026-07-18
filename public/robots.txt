@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Admin surface and the authenticated area. Nothing here is useful to a searcher, and
+# indexing it just advertises the login.
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auth
+
+# Applicant-specific pages. Both already send `robots: noindex` in their head, but a
+# crawler shouldn't be spending budget fetching them to find that out.
+Disallow: /apply/success
+Disallow: /portal
+
+Sitemap: https://talentscollege.ug/sitemap.xml

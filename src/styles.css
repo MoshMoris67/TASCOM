@@ -1,0 +1,201 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Talents College — Design System
+ * Palette: deep navy, bright blue, cream, white.
+ * Legacy `--flag-*` token names are kept as aliases mapped to the new palette
+ * so existing component classes (bg-flag-black, etc.) keep working.
+ * All color values use oklch. Never hardcode colors in components.
+ */
+
+@theme inline {
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand tokens (aliased to legacy flag-* names) */
+  --color-navy: var(--flag-black);
+  --color-cream: var(--flag-yellow);
+  --color-blue: var(--flag-red);
+  --color-sky: var(--flag-blue);
+  --color-flag-black: var(--flag-black);
+  --color-flag-yellow: var(--flag-yellow);
+  --color-flag-red: var(--flag-red);
+  --color-flag-blue: var(--flag-blue);
+
+  --shadow-elegant: 0 20px 60px -20px color-mix(in oklab, var(--flag-black) 35%, transparent);
+  --shadow-glow: 0 0 40px color-mix(in oklab, var(--flag-red) 45%, transparent);
+  --gradient-brand: linear-gradient(135deg, var(--flag-black) 0%, var(--flag-red) 55%, var(--flag-blue) 100%);
+  --gradient-hero: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--flag-black) 85%, transparent) 100%);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Legacy names now map to: navy / cream / blue / sky */
+  --flag-black: oklch(0.22 0.06 258);   /* deep navy */
+  --flag-yellow: oklch(0.95 0.025 85);  /* warm cream */
+  --flag-red: oklch(0.52 0.18 252);     /* vibrant blue */
+  --flag-blue: oklch(0.68 0.13 235);    /* sky blue */
+
+  --background: oklch(0.985 0.008 85);  /* off-white with a cream hint */
+  --foreground: oklch(0.22 0.06 258);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.06 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.06 258);
+
+  --primary: oklch(0.22 0.06 258);
+  --primary-foreground: oklch(0.98 0.005 85);
+  --secondary: oklch(0.95 0.015 240);
+  --secondary-foreground: oklch(0.22 0.06 258);
+  --muted: oklch(0.95 0.015 240);
+  --muted-foreground: oklch(0.45 0.03 258);
+  --accent: oklch(0.52 0.18 252);
+  --accent-foreground: oklch(0.98 0.005 85);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0.015 240);
+  --input: oklch(0.92 0.012 240);
+  --ring: oklch(0.52 0.18 252);
+}
+
+.dark {
+  --background: oklch(0.15 0.03 258);
+  --foreground: oklch(0.97 0.01 85);
+  --card: oklch(0.19 0.04 258);
+  --card-foreground: oklch(0.97 0.01 85);
+  --popover: oklch(0.19 0.04 258);
+  --popover-foreground: oklch(0.97 0.01 85);
+
+  --primary: oklch(0.68 0.13 235);
+  --primary-foreground: oklch(0.15 0.03 258);
+  --secondary: oklch(0.24 0.04 258);
+  --secondary-foreground: oklch(0.97 0.01 85);
+  --muted: oklch(0.24 0.04 258);
+  --muted-foreground: oklch(0.72 0.02 240);
+  --accent: oklch(0.68 0.13 235);
+  --accent-foreground: oklch(0.15 0.03 258);
+  --destructive: oklch(0.62 0.22 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.68 0.13 235);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background-color: var(--flag-yellow);
+    color: var(--flag-black);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--flag-red);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@utility flag-stripe {
+  background: linear-gradient(
+    to right,
+    var(--flag-black) 0%,
+    var(--flag-black) 33.33%,
+    var(--flag-red) 33.33%,
+    var(--flag-red) 66.66%,
+    var(--flag-yellow) 66.66%,
+    var(--flag-yellow) 100%
+  );
+}
+
+@utility text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility container-page {
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-page { padding-inline: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .container-page { padding-inline: 2rem; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@utility animate-fade-up { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@utility animate-fade-in { animation: fade-in 0.6s ease-out both; }
+@utility animate-marquee { animation: marquee 40s linear infinite; }
+@utility animate-shimmer { animation: shimmer 2s ease-in-out infinite; }
