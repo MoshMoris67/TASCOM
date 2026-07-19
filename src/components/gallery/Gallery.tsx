@@ -202,12 +202,23 @@ function Lightbox({
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const restoreTo = useRef<HTMLElement | null>(null);
+  const touchX = useRef<number | null>(null);
 
   const prev = useCallback(
     () => onIndex((index - 1 + photos.length) % photos.length),
     [index, photos.length, onIndex],
   );
   const next = useCallback(() => onIndex((index + 1) % photos.length), [index, photos.length, onIndex]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current === null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) > 50) (dx < 0 ? next : prev)();
+  };
 
   useEffect(() => {
     restoreTo.current = document.activeElement as HTMLElement;
@@ -258,7 +269,11 @@ function Lightbox({
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-center justify-center gap-2 px-2 md:gap-4 md:px-6">
+      <div
+        className="flex min-h-0 flex-1 touch-pan-y items-center justify-center gap-2 px-2 md:gap-4 md:px-6"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <NavButton label="Previous photo" onClick={prev}>
           <ChevronLeft className="size-6" />
         </NavButton>
@@ -268,6 +283,7 @@ function Lightbox({
           alt={photo.alt}
           onClick={(e) => e.stopPropagation()}
           className="max-h-full min-h-0 max-w-full rounded-xl object-contain shadow-elegant"
+          draggable={false}
         />
 
         <NavButton label="Next photo" onClick={next}>
