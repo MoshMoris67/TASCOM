@@ -18,6 +18,9 @@ import {
 import { photos } from "@/lib/photos";
 import badge from "@/assets/badge.png";
 import { school } from "@/lib/school-info";
+import { Reveal, RevealGroup } from "@/components/motion/Reveal";
+import { Img } from "@/components/motion/Img";
+import { useInView, usePrefersReducedMotion } from "@/hooks/use-in-view";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -59,21 +62,40 @@ const testimonials = [
   { q: "Talents College Mukono balances discipline with creativity — that combination is rare and it works.", a: "— Rev. James M., Alumnus" },
 ];
 
+// Eased so the number sprints then settles, instead of a flat linear crawl.
+const easeOutExpo = (p: number) => (p === 1 ? 1 : 1 - Math.pow(2, -10 * p));
+
 function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const reduced = usePrefersReducedMotion();
+  // Count up only when the stats card actually enters the viewport, so the
+  // animation is seen rather than finishing off-screen before the user arrives.
+  const { ref, inView } = useInView<HTMLSpanElement>({ threshold: 0.4 });
   const [n, setN] = useState(0);
+
   useEffect(() => {
+    if (!inView) return;
+    if (reduced) {
+      setN(target);
+      return;
+    }
     let raf = 0;
     const start = performance.now();
     const dur = 1600;
     const step = (t: number) => {
       const p = Math.min(1, (t - start) / dur);
-      setN(Math.floor(p * target));
+      setN(Math.round(easeOutExpo(p) * target));
       if (p < 1) raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [target]);
-  return <>{n.toLocaleString()}{suffix}</>;
+  }, [target, inView, reduced]);
+
+  return (
+    <span ref={ref}>
+      {n.toLocaleString()}
+      {suffix}
+    </span>
+  );
 }
 
 function Home() {
@@ -102,7 +124,7 @@ function Home() {
               alt=""
               width={1920}
               height={1280}
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === slide ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === slide ? "opacity-100 animate-ken-burns" : "opacity-0"}`}
             />
           ))}
           <div className="absolute inset-0 bg-gradient-to-b from-flag-black/70 via-flag-black/55 to-flag-black/90" />
@@ -175,16 +197,24 @@ function Home() {
 
       {/* WELCOME */}
       <section className="container-page py-20 md:py-28 grid gap-12 md:grid-cols-12 items-center">
-        <div className="md:col-span-5">
+        <Reveal className="md:col-span-5" y={28}>
           <div className="relative">
-            <img src={photos.library} alt="Head Teacher's welcome" width={1280} height={960} loading="lazy" className="rounded-3xl shadow-elegant aspect-[4/5] object-cover" />
+            <Img
+              src={photos.library}
+              alt="Head Teacher's welcome"
+              width={1280}
+              height={960}
+              loading="lazy"
+              wrapperClassName="rounded-3xl shadow-elegant aspect-[4/5]"
+              className="h-full w-full object-cover"
+            />
             <div className="absolute -bottom-6 -right-4 md:-right-8 bg-flag-black text-white p-5 rounded-2xl max-w-[240px] shadow-elegant flex gap-3 items-start">
               <img src={badge} alt="" className="size-12 shrink-0 object-contain" />
               <p className="text-sm leading-relaxed">A school where every learner's gift is discovered — and stretched.</p>
             </div>
           </div>
-        </div>
-        <div className="md:col-span-7">
+        </Reveal>
+        <Reveal className="md:col-span-7" delay={120}>
           <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">From the Head Teacher</div>
           <h2 className="mt-2 font-display font-black text-3xl md:text-5xl leading-tight">A warm welcome to Talents College Mukono.</h2>
           <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
@@ -206,17 +236,17 @@ function Home() {
               <div className="text-sm text-muted-foreground">Talents College Mukono</div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* HIGHLIGHTS */}
       <section className="bg-muted/40 border-y border-border py-20">
         <div className="container-page">
-          <div className="max-w-2xl">
+          <Reveal className="max-w-2xl">
             <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Why Talents College Mukono</div>
             <h2 className="mt-2 font-display font-black text-3xl md:text-5xl">A well-rounded, future-ready education.</h2>
-          </div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          </Reveal>
+          <RevealGroup className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {highlights.map((h) => (
               <div key={h.title} className="group bg-card border border-border rounded-2xl p-6 hover:shadow-elegant hover:-translate-y-1 transition-all">
                 <div className="size-12 rounded-xl bg-flag-black grid place-items-center group-hover:bg-flag-red transition-colors">
@@ -226,13 +256,13 @@ function Home() {
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{h.body}</p>
               </div>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
       {/* STATS */}
       <section className="container-page py-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <RevealGroup className="grid grid-cols-2 md:grid-cols-4 gap-4" stagger={80}>
           {stats.map((s) => (
             <div key={s.label} className="text-center border border-border rounded-2xl p-6 bg-card">
               <div className="font-display font-black text-4xl md:text-5xl text-gradient-brand">
@@ -241,13 +271,13 @@ function Home() {
               <div className="mt-2 text-sm text-muted-foreground">{s.label}</div>
             </div>
           ))}
-        </div>
+        </RevealGroup>
       </section>
 
       {/* NEWS & EVENTS */}
       <section className="container-page py-16 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="flex items-end justify-between mb-8">
+          <Reveal className="flex items-end justify-between mb-8">
             <div>
               <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Latest News</div>
               <h2 className="mt-2 font-display font-black text-3xl md:text-4xl">What's happening on campus.</h2>
@@ -255,8 +285,8 @@ function Home() {
             <Link to="/news" className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold hover:text-flag-red">
               View all <ArrowRight className="size-4" />
             </Link>
-          </div>
-          <div className="space-y-4">
+          </Reveal>
+          <RevealGroup className="space-y-4">
             {news.map((n) => (
               <article key={n.title} className="group grid grid-cols-[auto_1fr] gap-5 p-5 rounded-2xl border border-border bg-card hover:border-flag-red transition-colors">
                 <div className="size-16 grid place-items-center rounded-xl bg-flag-yellow text-flag-black font-display font-bold">
@@ -275,13 +305,15 @@ function Home() {
                 </div>
               </article>
             ))}
-          </div>
+          </RevealGroup>
         </div>
 
         <div>
-          <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Upcoming Events</div>
-          <h2 className="mt-2 font-display font-black text-3xl">On the calendar.</h2>
-          <div className="mt-6 space-y-3">
+          <Reveal>
+            <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Upcoming Events</div>
+            <h2 className="mt-2 font-display font-black text-3xl">On the calendar.</h2>
+          </Reveal>
+          <RevealGroup className="mt-6 space-y-3" stagger={70}>
             {events.map((e) => (
               <div key={e.title} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
                 <div className="size-14 rounded-lg bg-flag-black text-white grid place-items-center shrink-0">
@@ -298,19 +330,27 @@ function Home() {
                 </div>
               </div>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
       {/* PROGRAMS SNAPSHOT */}
-      <section className="container-page py-20 grid gap-4 md:grid-cols-3">
+      <RevealGroup as="section" className="container-page py-20 grid gap-4 md:grid-cols-3" stagger={110}>
         {[
           { img: photos.examWriting, title: "Ordinary Level (O)", desc: "Senior 1–4. A broad foundation across sciences, humanities and languages preparing students for UCE.", href: "/academics" },
           { img: photos.labFlaskHold, title: "Advanced Level (A)", desc: "Senior 5–6. Specialised subject combinations preparing students for university and career pathways.", href: "/academics" },
           { img: photos.culture1, title: "Talents Program", desc: "Music, dance, drama, sports, ICT and enterprise clubs — every student develops at least one talent.", href: "/student-life" },
         ].map((c) => (
           <Link to={c.href} key={c.title} className="group relative rounded-3xl overflow-hidden aspect-[4/5] block">
-            <img src={c.img} alt="" width={1280} height={960} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <Img
+              src={c.img}
+              alt=""
+              width={1280}
+              height={960}
+              loading="lazy"
+              wrapperClassName="absolute inset-0"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-flag-black via-flag-black/30 to-transparent" />
             <div className="absolute inset-0 p-7 flex flex-col justify-end text-white">
               <h3 className="font-display font-black text-2xl">{c.title}</h3>
@@ -321,7 +361,7 @@ function Home() {
             </div>
           </Link>
         ))}
-      </section>
+      </RevealGroup>
 
       {/* TESTIMONIAL */}
       <section className="bg-flag-black text-white py-24 relative overflow-hidden">

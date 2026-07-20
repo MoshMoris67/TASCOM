@@ -57,6 +57,19 @@
   --shadow-glow: 0 0 40px color-mix(in oklab, var(--flag-red) 45%, transparent);
   --gradient-brand: linear-gradient(135deg, var(--flag-black) 0%, var(--flag-red) 55%, var(--flag-blue) 100%);
   --gradient-hero: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--flag-black) 85%, transparent) 100%);
+
+  /*
+   * Motion language — one shared vocabulary for all animation.
+   * `--ease-out-expo` is the existing hero curve; reuse it everywhere so motion
+   * across the site feels like one hand made it. Durations are a small ladder:
+   * quick for hover/state, base for reveals, slow for hero/ambient drift.
+   */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-quick: 200ms;
+  --duration-base: 500ms;
+  --duration-slow: 700ms;
+  --duration-ambient: 1200ms;
 }
 
 :root {
@@ -119,7 +132,8 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth removed — use Lenis (npm i lenis) for momentum scroll,
+     * with `lerp: 0.08` and it must be disabled under `prefers-reduced-motion`. */
   }
 
   body {
@@ -199,3 +213,64 @@
 @utility animate-fade-in { animation: fade-in 0.6s ease-out both; }
 @utility animate-marquee { animation: marquee 40s linear infinite; }
 @utility animate-shimmer { animation: shimmer 2s ease-in-out infinite; }
+
+/*
+ * Scroll-reveal primitive (driven by the useInView hook via a data attribute).
+ * The element renders in its final position for SSR/no-JS/crawlers, then the
+ * hook adds `data-reveal` (hidden) on mount and flips it to visible on entry.
+ * transform/opacity only — no layout properties, so no CLS.
+ */
+@layer utilities {
+  [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-y, 20px), 0);
+    transition:
+      opacity var(--duration-base) var(--ease-out-expo),
+      transform var(--duration-base) var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  [data-reveal="visible"] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    will-change: auto;
+  }
+}
+
+/* Slow ambient drift for the active hero image (Ken-Burns). */
+@keyframes ken-burns {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(0, -1.5%, 0); }
+}
+@utility animate-ken-burns {
+  animation: ken-burns 12s var(--ease-out-soft) both;
+}
+
+/* Route transition — a short crossfade+rise applied to page content on mount. */
+@keyframes route-enter {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@utility animate-route-enter {
+  animation: route-enter var(--duration-base) var(--ease-out-expo) both;
+}
+
+/*
+ * Global reduced-motion safety net. Every animation/transition on the site —
+ * existing and new — collapses to an instant, final state. Reveal elements are
+ * forced visible so no content is ever hidden behind a disabled animation.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
