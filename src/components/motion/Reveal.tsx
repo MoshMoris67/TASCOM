@@ -13,20 +13,29 @@ import { cn } from "@/lib/utils";
 import { useInView, usePrefersReducedMotion } from "@/hooks/use-in-view";
 
 type RevealProps = {
-  children: ReactNode;
+  children?: ReactNode;
   as?: ElementType;
   className?: string;
   delay?: number;
   y?: number;
+  x?: number;
   threshold?: number;
 };
 
 /**
  * Fades + rises its children in as they enter the viewport, once.
  *
- * No motion/attributes are applied until the observer has reported back at
- * least once (`inView` is `undefined` until then). This prevents a flash of
- * hidden content on client mount or for elements already in view.
+ * Sequencing (critical for the transition to actually play):
+ *   1. Server render: no `data-reveal` attribute — children are fully visible
+ *      (good for SSR, crawlers, no-JS, no CLS).
+ *   2. Client mount: `data-reveal=""` is applied — the `[data-reveal]` CSS rule
+ *      hides the element with opacity 0 + translateY, but the transition is
+ *      already armed.
+ *   3. Observer confirms entry: `data-reveal="visible"` flips to the visible
+ *      state and the browser animates the change.
+ *
+ * Under `prefers-reduced-motion`, steps 2 and 3 are skipped entirely so the
+ * element never disappears or animates.
  */
 export function Reveal({
   children,
@@ -34,6 +43,7 @@ export function Reveal({
   className,
   delay = 0,
   y = 20,
+  x = 0,
   threshold,
 }: RevealProps) {
   const Tag = (as ?? "div") as ElementType;
@@ -43,18 +53,25 @@ export function Reveal({
 
   useEffect(() => setMounted(true), []);
 
-  // Wait for both mount and the first observer tick before deciding.
   const ready = mounted && inView !== undefined;
   // If reduced motion is on, never hide/transition — render normally.
+  // If not ready yet (before first observer tick), also render normally.
   const animate = ready && !reduced;
-  const state = animate ? (inView ? "visible" : "") : undefined;
+  // After mount, arm the hidden state so the transition has a from/to pair.
+  const state: string | undefined = !mounted
+    ? undefined
+    : !animate
+      ? ""
+      : inView
+        ? "visible"
+        : "";
 
   return (
     <Tag
       ref={ref}
       data-reveal={state}
       className={className}
-      style={animate ? revealVars(y, delay) : undefined}
+      style={animate ? revealVars(y, delay, x) : undefined}
     >
       {children}
     </Tag>
@@ -86,7 +103,19 @@ function RevealItem({
 
   const ready = mounted && inView !== undefined;
   const animate = ready && !reduced;
-  if (!animate) return child;
+  if (!animate) {
+    // After mount but before reduced-motion check, still arm hidden state so
+    // the transition can play once we know motion is allowed.
+    if (mounted && !reduced && inView === undefined) {
+      const childProps = child.props as { style?: React.CSSProperties };
+      return cloneElement(child as ReactElement<Record<string, unknown>>, {
+        ref: ref as Ref<unknown>,
+        "data-reveal": "",
+        style: { ...childProps.style, ...revealVars(y ?? 20, delay) },
+      });
+    }
+    return child;
+  }
 
   const childProps = child.props as { style?: React.CSSProperties };
   const revealState = inView ? "visible" : "";
@@ -145,9 +174,10 @@ export function RevealGroup({
   );
 }
 
-function revealVars(y: number, delay: number): React.CSSProperties {
+function revealVars(y: number, delay: number, x = 0): React.CSSProperties {
   return {
     "--reveal-y": `${y}px`,
+    "--reveal-x": `${x}px`,
     "--reveal-delay": `${delay}ms`,
   } as React.CSSProperties;
 }

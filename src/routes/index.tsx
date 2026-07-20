@@ -124,28 +124,28 @@ function Home() {
               alt=""
               width={1920}
               height={1280}
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === slide ? "opacity-100 animate-ken-burns" : "opacity-0"}`}
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === slide ? `opacity-100 ${i % 2 === 0 ? "animate-ken-burns" : "animate-ken-burns-alt"}` : "opacity-0"}`}
             />
           ))}
           <div className="absolute inset-0 bg-gradient-to-b from-flag-black/70 via-flag-black/55 to-flag-black/90" />
         </div>
 
         <div className="relative container-page min-h-[92vh] flex items-end pb-16 md:pb-24 pt-24 text-white">
-          <div className="max-w-3xl animate-fade-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs uppercase tracking-widest">
+          <div className="max-w-3xl">
+            <div className="hero-enter-1 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs uppercase tracking-widest">
               <span className="size-1.5 rounded-full bg-flag-yellow animate-shimmer" />
               Est. 2002 · Mukono, Uganda
             </div>
-            <h1 className="mt-5 font-display font-black text-4xl sm:text-5xl md:text-7xl leading-[1.02]">
+            <h1 className="hero-enter-2 mt-5 font-display font-black text-4xl sm:text-5xl md:text-7xl leading-[1.02]">
               Nurturing Talents,{" "}
               <span className="text-flag-yellow">Shaping Futures.</span>
             </h1>
-            <p className="mt-5 text-base md:text-lg text-white/85 max-w-xl">
+            <p className="hero-enter-3 mt-5 text-base md:text-lg text-white/85 max-w-xl">
               A private co-educational day &amp; boarding secondary school offering 'O' and 'A'
               Level education — where curriculum meets practical talent.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="hero-enter-4 mt-8 flex flex-wrap gap-3">
               <Link
                 to="/admissions"
                 className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flag-red text-white font-semibold shadow-elegant hover:opacity-90"
@@ -162,7 +162,7 @@ function Home() {
               </Link>
             </div>
 
-            <div className="mt-10 flex items-center gap-4">
+            <div className="hero-enter-5 mt-10 flex items-center gap-4">
               {slides.map((_, i) => (
                 <button
                   key={i}
@@ -197,7 +197,7 @@ function Home() {
 
       {/* WELCOME */}
       <section className="container-page py-20 md:py-28 grid gap-12 md:grid-cols-12 items-center">
-        <Reveal className="md:col-span-5" y={28}>
+        <Reveal className="md:col-span-5" y={28} x={-56}>
           <div className="relative">
             <Img
               src={photos.library}
@@ -214,7 +214,7 @@ function Home() {
             </div>
           </div>
         </Reveal>
-        <Reveal className="md:col-span-7" delay={120}>
+        <Reveal className="md:col-span-7" delay={120} x={56}>
           <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">From the Head Teacher</div>
           <h2 className="mt-2 font-display font-black text-3xl md:text-5xl leading-tight">A warm welcome to Talents College Mukono.</h2>
           <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
@@ -245,6 +245,7 @@ function Home() {
           <Reveal className="max-w-2xl">
             <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Why Talents College Mukono</div>
             <h2 className="mt-2 font-display font-black text-3xl md:text-5xl">A well-rounded, future-ready education.</h2>
+            <Reveal className="draw-divider mt-5 h-1 w-16 rounded-full bg-flag-red" delay={200} />
           </Reveal>
           <RevealGroup className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {highlights.map((h) => (
