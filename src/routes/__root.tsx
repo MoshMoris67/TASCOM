@@ -4,11 +4,10 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -16,8 +15,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { Toaster } from "sonner";
-import Lenis from "lenis";
-import { usePrefersReducedMotion } from "@/hooks/use-in-view";
 
 function NotFoundComponent() {
   return (
@@ -128,29 +125,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const reduced = usePrefersReducedMotion();
-  const raf = useRef(0);
-
-  useEffect(() => {
-    if (reduced) return;
-    const lenis = new Lenis({
-      lerp: 0.08,
-      smoothWheel: true,
-      wheelMultiplier: 0.9,
-    });
-
-    const tick = (time: number) => {
-      lenis.raf(time);
-      raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(raf.current);
-      lenis.destroy();
-    };
-  }, [reduced]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -158,9 +132,7 @@ function RootComponent() {
         <div className="flex min-h-dvh flex-col">
           <Header />
           <main className="flex-1">
-            <div key={pathname} className="animate-route-enter">
-              <Outlet />
-            </div>
+            <Outlet />
           </main>
           <Footer />
         </div>
