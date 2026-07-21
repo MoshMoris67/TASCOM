@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/layout/PageHero";
+import { CardGrid } from "@/components/motion";
 import { Calendar, Bell, Image, Video, ArrowRight } from "lucide-react";
 import { photos } from "@/lib/photos";
 import { GalleryPreview } from "@/components/gallery/Gallery";
@@ -69,7 +70,7 @@ function Media() {
       />
 
       <Section>
-        <div className="grid gap-8 lg:grid-cols-3">
+        <CardGrid className="grid gap-8 lg:grid-cols-3" tilt>
           {highlights.map((card) => {
             const inner = (
               <>
@@ -112,12 +113,12 @@ function Media() {
               </div>
             );
           })}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section id="news">
         <div className="grid gap-10 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+          <CardGrid className="lg:col-span-2 space-y-6">
             {posts.map((post) => (
               <article
                 key={post.slug}
@@ -148,7 +149,7 @@ function Media() {
                 </Link>
               </article>
             ))}
-          </div>
+          </CardGrid>
 
           <aside className="space-y-6">
             <div className="rounded-3xl border border-border bg-card p-8">

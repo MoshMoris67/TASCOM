@@ -14,6 +14,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingActions } from "@/components/layout/FloatingActions";
+import { ScrollProgress } from "@/components/motion";
 import { Toaster } from "sonner";
 
 function NotFoundComponent() {
@@ -129,6 +130,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <ScrollProgress />
         <div className="flex min-h-dvh flex-col">
           <Header />
           <main className="flex-1">

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section, Band } from "@/components/layout/PageHero";
+import { CardGrid } from "@/components/motion";
 import {
   Award,
   BookOpen,
@@ -16,6 +17,25 @@ import {
 } from "lucide-react";
 import { photos } from "@/lib/photos";
 import { school } from "@/lib/school-info";
+
+import staff01 from "@/assets/staff-placeholder-01.svg?inline";
+import staff02 from "@/assets/staff-placeholder-02.svg?inline";
+import staff03 from "@/assets/staff-placeholder-03.svg?inline";
+import staff04 from "@/assets/staff-placeholder-04.svg?inline";
+import staff05 from "@/assets/staff-placeholder-05.svg?inline";
+import staff06 from "@/assets/staff-placeholder-06.svg?inline";
+import staff07 from "@/assets/staff-placeholder-07.svg?inline";
+import staff08 from "@/assets/staff-placeholder-08.svg?inline";
+import staff09 from "@/assets/staff-placeholder-09.svg?inline";
+import staff10 from "@/assets/staff-placeholder-10.svg?inline";
+import staff11 from "@/assets/staff-placeholder-11.svg?inline";
+import staff12 from "@/assets/staff-placeholder-12.svg?inline";
+import staff13 from "@/assets/staff-placeholder-13.svg?inline";
+import staff14 from "@/assets/staff-placeholder-14.svg?inline";
+import staff15 from "@/assets/staff-placeholder-15.svg?inline";
+import staff16 from "@/assets/staff-placeholder-16.svg?inline";
+import staff17 from "@/assets/staff-placeholder-17.svg?inline";
+import staff18 from "@/assets/staff-placeholder-18.svg?inline";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -105,28 +125,28 @@ const whyChooseUs = [
 ];
 
 const leadership = [
-  { name: "The Head Teacher", role: "Head of School" },
-  { name: "Deputy Head Teacher", role: "Assistant Head Teacher" },
-  { name: "Bursar", role: "Finance & Administration" },
-  { name: "Director of Studies", role: "Curriculum & Examinations" },
-  { name: "Deputy Director of Studies", role: "Assistant DOS" },
+  { name: "The Head Teacher", role: "Head of School", photo: staff01 },
+  { name: "Deputy Head Teacher", role: "Assistant Head Teacher", photo: staff02 },
+  { name: "Bursar", role: "Finance & Administration", photo: staff03 },
+  { name: "Director of Studies", role: "Curriculum & Examinations", photo: staff04 },
+  { name: "Deputy Director of Studies", role: "Assistant DOS", photo: staff05 },
 ];
 
 // TODO(content): Placeholder names for layout purposes only. Replace with the real
 // staff directory (with each person's consent to be listed) before launch.
 const staff = [
-  { name: "Mr. J. Okello", role: "Head Teacher", dept: "Administration" },
-  { name: "Ms. R. Nabwire", role: "Deputy — Academics", dept: "Administration" },
-  { name: "Mr. P. Ssemakula", role: "Deputy — Welfare", dept: "Administration" },
-  { name: "Ms. A. Nakato", role: "HoD Sciences", dept: "Sciences" },
-  { name: "Mr. D. Kayemba", role: "HoD Mathematics", dept: "Mathematics" },
-  { name: "Ms. G. Namutebi", role: "HoD Languages", dept: "Languages" },
-  { name: "Mr. B. Mugisha", role: "HoD Humanities", dept: "Humanities" },
-  { name: "Ms. S. Nabirye", role: "HoD Creative Arts", dept: "Creative Arts" },
-  { name: "Mr. E. Ochieng", role: "ICT Coordinator", dept: "Vocational & Tech" },
-  { name: "Ms. J. Akello", role: "Guidance & Counselling", dept: "Welfare" },
-  { name: "Mr. F. Wasswa", role: "Games Master", dept: "Sports" },
-  { name: "Ms. L. Namubiru", role: "Boarding Matron", dept: "Welfare" },
+  { name: "Mr. J. Okello", role: "Head Teacher", dept: "Administration", photo: staff06 },
+  { name: "Ms. R. Nabwire", role: "Deputy — Academics", dept: "Administration", photo: staff07 },
+  { name: "Mr. P. Ssemakula", role: "Deputy — Welfare", dept: "Administration", photo: staff08 },
+  { name: "Ms. A. Nakato", role: "HoD Sciences", dept: "Sciences", photo: staff09 },
+  { name: "Mr. D. Kayemba", role: "HoD Mathematics", dept: "Mathematics", photo: staff10 },
+  { name: "Ms. G. Namutebi", role: "HoD Languages", dept: "Languages", photo: staff11 },
+  { name: "Mr. B. Mugisha", role: "HoD Humanities", dept: "Humanities", photo: staff12 },
+  { name: "Ms. S. Nabirye", role: "HoD Creative Arts", dept: "Creative Arts", photo: staff13 },
+  { name: "Mr. E. Ochieng", role: "ICT Coordinator", dept: "Vocational & Tech", photo: staff14 },
+  { name: "Ms. J. Akello", role: "Guidance & Counselling", dept: "Welfare", photo: staff15 },
+  { name: "Mr. F. Wasswa", role: "Games Master", dept: "Sports", photo: staff16 },
+  { name: "Ms. L. Namubiru", role: "Boarding Matron", dept: "Welfare", photo: staff17 },
 ];
 
 const staffPrinciples = [
@@ -235,8 +255,10 @@ function About() {
                   Why choose us
                 </div>
               </div>
-              <h2 className="mt-4 font-display font-black text-3xl">A school that earns your trust.</h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <h2 className="mt-4 font-display font-black text-3xl">
+                A school that earns your trust.
+              </h2>
+              <CardGrid className="mt-6 grid gap-4 sm:grid-cols-2" stagger={70}>
                 {whyChooseUs.map((c) => (
                   <div key={c.title}>
                     <div className="flex items-start gap-2.5">
@@ -246,7 +268,7 @@ function About() {
                     <p className="mt-1.5 text-sm text-muted-foreground">{c.body}</p>
                   </div>
                 ))}
-              </div>
+              </CardGrid>
             </div>
 
             <div className="rounded-3xl p-8 md:p-10 bg-flag-black text-white">
@@ -278,8 +300,10 @@ function About() {
             <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">
               Core values & principles
             </div>
-            <h2 className="mt-2 font-display font-black text-3xl md:text-4xl">What we stand for.</h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <h2 className="mt-2 font-display font-black text-3xl md:text-4xl">
+              What we stand for.
+            </h2>
+            <CardGrid className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" tilt tiltMax={7}>
               {values.map((v) => (
                 <div
                   key={v.title}
@@ -292,7 +316,7 @@ function About() {
                   <p className="mt-1.5 text-sm text-muted-foreground">{v.body}</p>
                 </div>
               ))}
-            </div>
+            </CardGrid>
           </div>
         </div>
       </Section>
@@ -304,12 +328,17 @@ function About() {
         <h2 className="mt-2 font-display font-black text-3xl md:text-4xl">
           The people who lead our school.
         </h2>
-        <div className="mt-10 flex gap-4 overflow-x-auto pb-2 snap-x">
+        <CardGrid className="mt-10 flex gap-4 overflow-x-auto pb-2 snap-x" stagger={60}>
           {leadership.map((p) => (
             <div
               key={p.name}
               className="group relative shrink-0 w-56 aspect-[3/4] rounded-2xl overflow-hidden bg-card border border-border snap-start flex flex-col items-center justify-end text-center p-5 transition-all hover:-translate-y-1 hover:shadow-elegant"
             >
+              <img
+                src={p.photo}
+                alt={p.name}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-flag-black/90 via-flag-black/30 to-transparent" />
               <div className="relative z-10">
                 <div className="font-display font-bold text-base leading-tight text-white">
@@ -319,7 +348,7 @@ function About() {
               </div>
             </div>
           ))}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section id="staff" className="!pt-0">
@@ -338,7 +367,7 @@ function About() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2">
+        <CardGrid className="mt-12 grid gap-5 md:grid-cols-2" tilt tiltMax={6}>
           {staffPrinciples.map((p) => (
             <div
               key={p.title}
@@ -351,7 +380,7 @@ function About() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
             </div>
           ))}
-        </div>
+        </CardGrid>
 
         <div className="mt-12 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -368,25 +397,30 @@ function About() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <CardGrid
+          className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          tilt
+          tiltMax={7}
+        >
           {staff.map((s) => (
             <div
               key={s.name}
-              className="group rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:shadow-elegant"
+              className="group relative rounded-2xl overflow-hidden bg-card border border-border aspect-[3/4] transition-all hover:-translate-y-0.5 hover:shadow-elegant"
             >
-              <div className="grid size-16 place-items-center rounded-full bg-gradient-to-br from-flag-red to-flag-blue font-display text-lg font-bold text-white">
-                {s.name
-                  .split(" ")
-                  .map((w) => w[0])
-                  .slice(0, 2)
-                  .join("")}
+              <img
+                src={s.photo}
+                alt={s.name}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-flag-black/90 via-flag-black/30 to-transparent" />
+              <div className="relative z-10 flex flex-col items-center justify-end h-full text-center p-5">
+                <div className="font-display text-lg font-bold text-white">{s.name}</div>
+                <div className="text-sm font-semibold text-flag-yellow">{s.role}</div>
+                <div className="mt-1 text-xs text-white/80">{s.dept}</div>
               </div>
-              <div className="mt-4 font-display text-lg font-bold">{s.name}</div>
-              <div className="text-sm font-semibold text-flag-red">{s.role}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{s.dept}</div>
             </div>
           ))}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section id="headteacher" className="!pt-0">

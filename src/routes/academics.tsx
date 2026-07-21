@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/layout/PageHero";
+import { CardGrid } from "@/components/motion";
 import {
   Atom,
   BookMarked,
@@ -239,7 +240,7 @@ function Academics() {
         <h2 className="mt-2 font-display font-black text-3xl md:text-4xl">
           Where subjects come alive.
         </h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <CardGrid className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" tilt tiltMax={7}>
           {departments.map((d) => (
             <div
               key={d.name}
@@ -252,7 +253,7 @@ function Academics() {
               <p className="text-sm text-muted-foreground">{d.head}</p>
             </div>
           ))}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section className="!pt-0">
@@ -262,7 +263,7 @@ function Academics() {
               Academic calendar & timetable
             </div>
             <h2 className="mt-2 font-display font-black text-3xl">Terms & key dates.</h2>
-            <div className="mt-6 space-y-4">
+            <CardGrid className="mt-6 space-y-4">
               {calendar.map((t) => (
                 <div
                   key={t.term}
@@ -275,7 +276,7 @@ function Academics() {
                   <div className="text-sm text-muted-foreground">{t.highlights}</div>
                 </div>
               ))}
-            </div>
+            </CardGrid>
           </div>
           <div id="exam-results" className="rounded-3xl p-8 bg-muted h-fit scroll-mt-24 md:scroll-mt-28">
             <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Examinations</div>

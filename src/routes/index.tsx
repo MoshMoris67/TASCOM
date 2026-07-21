@@ -18,6 +18,7 @@ import {
 import { photos } from "@/lib/photos";
 import badge from "@/assets/badge.png";
 import { school } from "@/lib/school-info";
+import { Reveal, TiltCard, Magnetic, useInView } from "@/components/motion";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -60,8 +61,14 @@ const testimonials = [
 ];
 
 function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const { ref, inView } = useInView<HTMLSpanElement>(0.4);
   const [n, setN] = useState(0);
   useEffect(() => {
+    if (!inView) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setN(target);
+      return;
+    }
     let raf = 0;
     const start = performance.now();
     const dur = 1600;
@@ -72,8 +79,13 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [target]);
-  return <>{n.toLocaleString()}{suffix}</>;
+  }, [inView, target]);
+  return (
+    <span ref={ref}>
+      {n.toLocaleString()}
+      {suffix}
+    </span>
+  );
 }
 
 function Home() {
@@ -124,12 +136,14 @@ function Home() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/admissions"
-                className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flag-red text-white font-semibold shadow-elegant hover:opacity-90"
-              >
-                Apply now <ArrowRight className="size-4" />
-              </Link>
+              <Magnetic>
+                <Link
+                  to="/admissions"
+                  className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flag-red text-white font-semibold shadow-elegant hover:opacity-90"
+                >
+                  Apply now <ArrowRight className="size-4" />
+                </Link>
+              </Magnetic>
               <Link
                 to="/contact"
                 className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-white/10 border border-white/30 text-white font-semibold hover:bg-white/20"
@@ -173,7 +187,7 @@ function Home() {
 
       {/* WELCOME */}
       <section className="container-page py-20 md:py-28 grid gap-12 md:grid-cols-12 items-center">
-        <div className="md:col-span-5">
+        <Reveal variant="left" className="md:col-span-5">
           <div className="relative">
             <img src={photos.library} alt="Head Teacher's welcome" width={1280} height={960} loading="lazy" className="rounded-3xl shadow-elegant aspect-[4/5] object-cover" />
             <div className="absolute -bottom-6 -right-4 md:-right-8 bg-flag-black text-white p-5 rounded-2xl max-w-[240px] shadow-elegant flex gap-3 items-start">
@@ -181,8 +195,8 @@ function Home() {
               <p className="text-sm leading-relaxed">A school where every learner's gift is discovered — and stretched.</p>
             </div>
           </div>
-        </div>
-        <div className="md:col-span-7">
+        </Reveal>
+        <Reveal variant="right" delay={120} className="md:col-span-7">
           <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">From the Head Teacher</div>
           <h2 className="mt-2 font-display font-black text-3xl md:text-5xl leading-tight">A warm welcome to Talents College Mukono.</h2>
           <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
@@ -204,25 +218,27 @@ function Home() {
               <div className="text-sm text-muted-foreground">Talents College Mukono</div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* HIGHLIGHTS */}
       <section className="bg-muted/40 border-y border-border py-20">
         <div className="container-page">
-          <div className="max-w-2xl">
+          <Reveal className="max-w-2xl">
             <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Why Talents College Mukono</div>
             <h2 className="mt-2 font-display font-black text-3xl md:text-5xl">A well-rounded, future-ready education.</h2>
-          </div>
+          </Reveal>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {highlights.map((h) => (
-              <div key={h.title} className="group bg-card border border-border rounded-2xl p-6 hover:shadow-elegant hover:-translate-y-1 transition-all">
-                <div className="size-12 rounded-xl bg-flag-black grid place-items-center group-hover:bg-flag-red transition-colors">
-                  <h.icon className="size-6 text-flag-yellow" />
-                </div>
-                <h3 className="mt-5 font-display font-bold text-lg">{h.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{h.body}</p>
-              </div>
+            {highlights.map((h, i) => (
+              <Reveal key={h.title} variant="up" delay={i * 90} className="h-full">
+                <TiltCard className="group h-full bg-card border border-border rounded-2xl p-6 hover:shadow-elegant transition-all">
+                  <div className="size-12 rounded-xl bg-flag-black grid place-items-center group-hover:bg-flag-red transition-colors">
+                    <h.icon className="size-6 text-flag-yellow" />
+                  </div>
+                  <h3 className="mt-5 font-display font-bold text-lg">{h.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{h.body}</p>
+                </TiltCard>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -231,13 +247,15 @@ function Home() {
       {/* STATS */}
       <section className="container-page py-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center border border-border rounded-2xl p-6 bg-card">
-              <div className="font-display font-black text-4xl md:text-5xl text-gradient-brand">
-                <Counter target={s.value} suffix={s.suffix} />
+          {stats.map((s, i) => (
+            <Reveal key={s.label} variant="up" delay={i * 80} className="h-full">
+              <div className="h-full text-center border border-border rounded-2xl p-6 bg-card">
+                <div className="font-display font-black text-4xl md:text-5xl text-gradient-brand">
+                  <Counter target={s.value} suffix={s.suffix} />
+                </div>
+                <div className="mt-2 text-sm text-muted-foreground">{s.label}</div>
               </div>
-              <div className="mt-2 text-sm text-muted-foreground">{s.label}</div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -255,8 +273,9 @@ function Home() {
             </Link>
           </div>
           <div className="space-y-4">
-            {news.map((n) => (
-              <article key={n.title} className="group grid grid-cols-[auto_1fr] gap-5 p-5 rounded-2xl border border-border bg-card hover:border-flag-red transition-colors">
+            {news.map((n, i) => (
+              <Reveal key={n.title} variant="up" delay={i * 90}>
+                <article className="group grid grid-cols-[auto_1fr] gap-5 p-5 rounded-2xl border border-border bg-card hover:border-flag-red transition-colors">
                 <div className="size-16 grid place-items-center rounded-xl bg-flag-yellow text-flag-black font-display font-bold">
                   <div className="text-center leading-none">
                     <div className="text-xl">{new Date(n.date).getDate()}</div>
@@ -271,7 +290,8 @@ function Home() {
                   <h3 className="mt-1.5 font-display font-bold text-lg truncate group-hover:text-flag-red">{n.title}</h3>
                   <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{n.excerpt}</p>
                 </div>
-              </article>
+                </article>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -280,8 +300,9 @@ function Home() {
           <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">Upcoming Events</div>
           <h2 className="mt-2 font-display font-black text-3xl">On the calendar.</h2>
           <div className="mt-6 space-y-3">
-            {events.map((e) => (
-              <div key={e.title} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
+            {events.map((e, i) => (
+              <Reveal key={e.title} variant="up" delay={i * 70}>
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
                 <div className="size-14 rounded-lg bg-flag-black text-white grid place-items-center shrink-0">
                   <div className="text-center leading-none">
                     <div className="text-xl font-bold">{e.d}</div>
@@ -295,6 +316,7 @@ function Home() {
                   </div>
                 </div>
               </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -306,8 +328,10 @@ function Home() {
           { img: photos.examWriting, title: "Ordinary Level (O)", desc: "Senior 1–4. A broad foundation across sciences, humanities and languages preparing students for UCE.", href: "/academics" },
           { img: photos.labFlaskHold, title: "Advanced Level (A)", desc: "Senior 5–6. Specialised subject combinations preparing students for university and career pathways.", href: "/academics" },
           { img: photos.culture1, title: "Talents Program", desc: "Music, dance, drama, sports, ICT and enterprise clubs — every student develops at least one talent.", href: "/student-life" },
-        ].map((c) => (
-          <Link to={c.href} key={c.title} className="group relative rounded-3xl overflow-hidden aspect-[4/5] block">
+        ].map((c, i) => (
+          <Reveal key={c.title} variant="up" delay={i * 100}>
+            <TiltCard max={7}>
+              <Link to={c.href} className="group relative rounded-3xl overflow-hidden aspect-[4/5] block">
             <img src={c.img} alt="" width={1280} height={960} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-flag-black via-flag-black/30 to-transparent" />
             <div className="absolute inset-0 p-7 flex flex-col justify-end text-white">
@@ -317,14 +341,16 @@ function Home() {
                 Learn more <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </div>
-          </Link>
+              </Link>
+            </TiltCard>
+          </Reveal>
         ))}
       </section>
 
       {/* TESTIMONIAL */}
       <section className="bg-flag-black text-white py-24 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_20%_20%,var(--flag-yellow),transparent_40%),radial-gradient(circle_at_80%_70%,var(--flag-red),transparent_45%)]" />
-        <div className="relative container-page text-center max-w-3xl mx-auto">
+        <Reveal variant="up" className="relative container-page text-center max-w-3xl mx-auto">
           <Quote className="size-10 text-flag-yellow mx-auto" />
           <blockquote key={testi} className="animate-fade-in mt-6 font-display text-2xl md:text-3xl leading-snug">
             "{testimonials[testi].q}"
@@ -340,7 +366,7 @@ function Home() {
               />
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* CTA */}
@@ -349,7 +375,7 @@ function Home() {
           <div className="absolute -top-24 -right-24 size-72 rounded-full bg-flag-yellow/30 blur-3xl" />
           <div className="absolute -bottom-24 -left-24 size-72 rounded-full bg-flag-black/30 blur-3xl" />
           <div className="relative grid md:grid-cols-2 gap-8 items-center">
-            <div>
+            <Reveal variant="left">
               <div className="text-xs uppercase tracking-widest opacity-80 font-semibold">Admissions 2027</div>
               <h2 className="mt-2 font-display font-black text-3xl md:text-5xl">Ready to join Talents College Mukono?</h2>
               <p className="mt-4 text-white/85 max-w-md">
@@ -357,15 +383,17 @@ function Home() {
                 or speak directly with the head teacher.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link to="/admissions" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flag-black text-flag-yellow font-semibold hover:bg-flag-black/80">
-                  Apply online <ArrowRight className="size-4" />
-                </Link>
+                <Magnetic>
+                  <Link to="/admissions" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flag-black text-flag-yellow font-semibold hover:bg-flag-black/80">
+                    Apply online <ArrowRight className="size-4" />
+                  </Link>
+                </Magnetic>
                 <Link to="/contact" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-white/10 border border-white/30 font-semibold hover:bg-white/20">
                   Book a visit
                 </Link>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            </Reveal>
+            <Reveal variant="right" delay={120} className="grid grid-cols-2 gap-4">
               <div className="bg-white/10 rounded-2xl p-5 backdrop-blur">
                 <MapPin className="size-6 text-flag-yellow" />
                 <div className="mt-3 text-sm opacity-85">Find us</div>
@@ -386,7 +414,7 @@ function Home() {
                 <div className="mt-3 text-sm opacity-85">Founded</div>
                 <div className="font-semibold text-sm mt-1">{school.founded}</div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/layout/PageHero";
+import { CardGrid } from "@/components/motion";
 import { BookOpen, Bus, Cpu, Music, Trophy, Users } from "lucide-react";
 import sports from "@/assets/sports.jpg";
 import culture from "@/assets/culture.jpg";
@@ -100,7 +101,7 @@ function StudentLife() {
               Every student joins at least one club. It's where friendships form and talents are
               discovered — often the memory a graduate carries longest.
             </p>
-            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <CardGrid className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3" stagger={45}>
               {clubs.map((c) => (
                 <div
                   key={c}
@@ -109,7 +110,7 @@ function StudentLife() {
                   {c}
                 </div>
               ))}
-            </div>
+            </CardGrid>
           </div>
 
           <aside className="rounded-3xl p-8 bg-flag-black text-white h-fit">
@@ -134,7 +135,7 @@ function StudentLife() {
       </Section>
 
       <Section id="sports" className="!pt-0">
-        <div className="grid gap-6 md:grid-cols-2">
+        <CardGrid className="grid gap-6 md:grid-cols-2" tilt tiltMax={6}>
           {facilities.map((f) => (
             <div key={f.title} className="group relative rounded-3xl overflow-hidden aspect-[4/3]">
               <img
@@ -150,7 +151,7 @@ function StudentLife() {
               </div>
             </div>
           ))}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section id="trips" className="!pt-0">

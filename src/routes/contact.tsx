@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/layout/PageHero";
+import { CardGrid } from "@/components/motion";
 import { photos } from "@/lib/photos";
 import { Mail, MapPin, MessageCircle, Phone, Send } from "lucide-react";
 import { useState } from "react";
@@ -76,9 +77,9 @@ function Contact() {
       />
 
       <Section>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <CardGrid className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" tilt tiltMax={7}>
           {cards.map((c) => (
-            <a key={c.label} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="p-6 rounded-2xl bg-card border border-border hover:border-flag-red hover:-translate-y-1 transition-all">
+            <a key={c.label} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="p-6 rounded-2xl bg-card border border-border hover:border-flag-red transition-all">
               <div className="size-11 rounded-xl bg-flag-yellow grid place-items-center">
                 <c.icon className="size-5 text-flag-black" />
               </div>
@@ -86,7 +87,7 @@ function Contact() {
               <div className="mt-1 font-semibold text-sm break-words">{c.value}</div>
             </a>
           ))}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section className="!pt-0 grid gap-8 lg:grid-cols-2">

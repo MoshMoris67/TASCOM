@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/layout/PageHero";
+import { CardGrid, Magnetic } from "@/components/motion";
 import { Users, Award, Handshake, ArrowRight } from "lucide-react";
 import alumni1 from "@/assets/alumni1.jpeg";
 import alumniInauguration from "@/assets/alumniinauguration.jpeg";
@@ -52,7 +53,7 @@ function Alumni() {
       />
 
       <Section>
-        <div className="grid gap-6 lg:grid-cols-3">
+        <CardGrid className="grid gap-6 lg:grid-cols-3" tilt>
           <div className="rounded-3xl border border-border bg-card p-8">
             <div className="inline-flex items-center justify-center rounded-3xl bg-flag-yellow p-4 text-flag-black">
               <Users className="size-6" />
@@ -74,11 +75,11 @@ function Alumni() {
             <h2 className="mt-6 text-3xl font-display font-black">Giving back</h2>
             <p className="mt-4 text-muted-foreground">Alumni support scholarship funds, campus improvements and leadership sessions for current students.</p>
           </div>
-        </div>
+        </CardGrid>
       </Section>
 
       <Section>
-        <div className="grid gap-6 lg:grid-cols-3">
+        <CardGrid className="grid gap-6 lg:grid-cols-3" tilt>
           {stories.map((story) => (
             <article key={story.title} className="overflow-hidden rounded-3xl border border-border bg-card shadow-elegant">
               <img src={story.image} alt={story.title} className="h-64 w-full object-cover" />
@@ -88,7 +89,7 @@ function Alumni() {
               </div>
             </article>
           ))}
-        </div>
+        </CardGrid>
       </Section>
 
       <Section className="!pt-0">
@@ -104,13 +105,15 @@ function Alumni() {
             write to yet, so it goes to the contact form, which reaches the same
             office that would maintain one. The label now says what happens.
           */}
-          <Link
-            to="/contact"
-            search={{ subject: "Alumni network" }}
-            className="mt-6 inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-flag-red px-6 py-3 font-semibold text-white transition-colors hover:bg-flag-yellow hover:text-flag-black lg:mt-0"
-          >
-            Join the alumni network <ArrowRight className="size-4" />
-          </Link>
+          <Magnetic className="mt-6 shrink-0 lg:mt-0">
+            <Link
+              to="/contact"
+              search={{ subject: "Alumni network" }}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-flag-red px-6 py-3 font-semibold text-white transition-colors hover:bg-flag-yellow hover:text-flag-black"
+            >
+              Join the alumni network <ArrowRight className="size-4" />
+            </Link>
+          </Magnetic>
         </div>
       </Section>
     </>

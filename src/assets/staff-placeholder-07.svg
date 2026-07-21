@@ -1,0 +1,50 @@
+<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg7" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E5E9E4"/>
+      <stop offset="100%" stop-color="#CBD8CC"/>
+    </linearGradient>
+    <radialGradient id="vig7" cx="50%" cy="38%" r="75%">
+      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.10"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="300" height="400" fill="url(#bg7)"/>
+
+  <ellipse cx="150.0" cy="163.6" rx="62.4" ry="78.0" fill="#161311" opacity="0.95"/>
+
+  <!-- shoulders / torso -->
+  <path d="M 18.0 420
+           L 18.0 225.44
+           Q 18.0 185.44 77.39999999999999 179.44
+           L 222.60000000000002 179.44
+           Q 282.0 185.44 282.0 225.44
+           L 282.0 420 Z" fill="#54433A"/>
+
+  
+        <path d="M 120.0 191.44 L 150.0 219.44 L 180.0 191.44 L 166.0 183.44 L 150.0 197.44 L 134.0 183.44 Z" fill="#F4EEE1" opacity="0.92"/>
+        <rect x="144.0" y="203.44" width="12" height="70" fill="#45342b"/>
+
+  <!-- neck -->
+  <rect x="132.0" y="176.6" width="36" height="40" fill="#A9764F"/>
+
+  <!-- head -->
+  <ellipse cx="150.0" cy="148" rx="44.72" ry="52" fill="#A9764F"/>
+
+  <!-- simple facial hints -->
+  <ellipse cx="134.0" cy="144" rx="4.5" ry="3" fill="#2b2018" opacity="0.55"/>
+  <ellipse cx="166.0" cy="144" rx="4.5" ry="3" fill="#2b2018" opacity="0.55"/>
+  <path d="M 141.0 170 Q 150.0 175 159.0 170" stroke="#2b2018" stroke-width="2.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+
+  
+
+  <!-- hair front -->
+  <path d="M 93.84 113.75999999999999 A 56.160000000000004 58.24000000000001 0 0 1 206.16 113.75999999999999 L 207.2 162.56 Q 194.2 141.76 186.4 162.56 Q 178.6 136.56 168.2  159.95999999999998 L 131.8 159.95999999999998 Q 121.4 136.56 113.6 162.56 Q 105.80000000000001 141.76 92.8 162.56 Z" fill="#161311"/>
+
+  <rect width="300" height="400" fill="url(#vig7)"/>
+
+  <!-- placeholder tag -->
+  <rect x="0" y="370" width="300" height="30" fill="#000000" opacity="0.28"/>
+  <text x="150.0" y="389" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#ffffff" opacity="0.9">PHOTO PLACEHOLDER</text>
+</svg>
