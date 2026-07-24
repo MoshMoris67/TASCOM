@@ -55,22 +55,17 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    // Media was merged in here. `match` keeps this item highlighted on the
+    // routes that used to belong to Media, so /news/<slug> and /gallery still
+    // light up a nav item instead of none.
     label: "Student Life",
     to: "/student-life",
+    match: ["/media", "/news", "/gallery", "/events"],
     submenu: [
       { label: "Clubs & Societies", to: "/student-life", hash: "clubs" },
       { label: "Sports", to: "/student-life", hash: "sports" },
-      { label: "School Trips", to: "/student-life", hash: "trips" },
-    ],
-  },
-  {
-    label: "Media",
-    to: "/media",
-    match: ["/news"],
-    submenu: [
-      { label: "News & Events", to: "/media", hash: "news" },
-      { label: "Events Calendar", to: "/media", hash: "events" },
-      { label: "Gallery", to: "/media", hash: "gallery" },
+      { label: "News & Events", to: "/student-life", hash: "news" },
+      { label: "Gallery", to: "/student-life", hash: "gallery" },
     ],
   },
   { label: "Alumni", to: "/alumni" },
@@ -100,6 +95,7 @@ export function Header() {
   const { theme, toggle } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerRef = useRef<HTMLElement | null>(null);
+  const stickyRef = useRef<HTMLDivElement | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
   const loadLatestNews = useServerFn(fetchLatestNews);
@@ -156,6 +152,31 @@ export function Header() {
     setOpenDropdownIndex(null);
   }, [pathname]);
 
+  /*
+    Anything that has to avoid sitting under the header needs to know how tall
+    it is, and that changes with breakpoint (the contact strip is md-only) and
+    with zoom. Publishing it as a custom property means overlays can subtract a
+    measured value instead of a hardcoded guess.
+
+    Skipped while the mobile menu is expanded: that inflates the wrapper to the
+    full menu height, which is not the height an overlay should avoid.
+  */
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el || open) return;
+    const publish = () => {
+      document.documentElement.style.setProperty("--site-header-h", `${el.offsetHeight}px`);
+    };
+    publish();
+    const ro = new ResizeObserver(publish);
+    ro.observe(el);
+    window.addEventListener("resize", publish);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", publish);
+    };
+  }, [open]);
+
   // Close dropdowns on outside click, and on Escape.
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -182,7 +203,7 @@ export function Header() {
   // order they're written in the class string. The inline rule can't be lost
   // that way.
   return (
-    <div className="sticky top-0 z-50" style={{ position: "sticky", top: 0 }}>
+    <div ref={stickyRef} className="sticky top-0 z-50" style={{ position: "sticky", top: 0 }}>
       <div className="hidden md:block bg-flag-black text-white text-xs">
         <div className="container-page flex items-center justify-between py-2">
           <div className="flex items-center gap-4 opacity-80">
@@ -205,7 +226,7 @@ export function Header() {
         className={cn(
           // Same treatment as the AI chat panel header: brand gradient left to
           // right, warm radial bloom over it, white type on top.
-          "relative bg-gradient-to-r from-flag-red via-flag-red to-[#c0392b] text-white",
+          "relative bg-linear-to-r/oklab from-flag-red via-flag-red via-50% to-flag-warm text-white",
           "border-b border-white/15",
           "shadow-[0_10px_30px_-14px_rgb(0_0_0/0.45)]",
           "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/25 before:content-['']",
@@ -222,11 +243,11 @@ export function Header() {
         </div>
         <div
           className={cn(
-            "container-page relative z-10 flex items-center justify-between gap-6 xl:gap-10",
+            "container-page relative z-10 flex items-center justify-between gap-3 sm:gap-6 xl:gap-10",
             "h-20 md:h-24",
           )}
         >
-          <Link to="/" className="group flex shrink-0 items-center gap-4">
+          <Link to="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-4 lg:shrink-0">
             <img
               src={crest}
               alt="Talents College Mukono crest"
@@ -246,10 +267,11 @@ export function Header() {
               wordmark for that one band frees ~240px, which is what pays for the
               extra padding below.
             */}
-            <div className="block leading-tight">
+            <div className="block min-w-0 lg:hidden xl:block leading-tight">
               <div
                 className={cn(
-                  "font-display font-bold tracking-tight text-[0.95rem] md:text-lg",
+                  "font-display font-bold tracking-tight text-[0.8rem] sm:text-[0.95rem] md:text-lg",
+                  "lg:whitespace-nowrap",
                 )}
               >
                 TALENTS COLLEGE MUKONO
@@ -257,7 +279,8 @@ export function Header() {
               {/* Collapses away on scroll — part of the shrink, not a separate trick. */}
               <div
                 className={cn(
-                  "text-[10px] uppercase tracking-[0.18em] text-white/75 md:text-[11px]",
+                  "truncate text-[9px] uppercase tracking-[0.14em] text-white/75",
+                  "sm:text-[10px] sm:tracking-[0.18em] md:text-[11px]",
                 )}
               >
                 Power of Knowledge
@@ -389,15 +412,15 @@ export function Header() {
                 <button
                   type="button"
                   aria-label="Notifications"
-                  className={cn(
-                    "grid size-10 place-items-center rounded-full bg-white/15 text-white relative",
-                    "transition-[background-color,color,transform] duration-200 motion-reduce:transition-none",
-                    "hover:bg-flag-yellow hover:text-flag-black active:scale-95",
-                  )}
-                >
-                  <Bell className="size-5" />
-                  {newsItems.length > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-flag-yellow text-[10px] font-bold text-flag-black ring-2 ring-[#c0392b]">
+                   className={cn(
+                     "grid size-10 place-items-center rounded-full bg-white/15 text-white relative",
+                     "transition-[background-color,color,transform] duration-200 motion-reduce:transition-none",
+                     "hover:bg-flag-yellow hover:text-flag-black active:scale-95",
+                   )}
+                 >
+                   <Bell className="size-5" />
+                   {newsItems.length > 0 && (
+                     <span className="absolute -top-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-flag-yellow text-[10px] font-bold text-flag-black ring-2 ring-[#c0392b]">
                       {newsItems.length}
                     </span>
                   )}
@@ -433,7 +456,7 @@ export function Header() {
               onClick={toggle}
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               className={cn(
-                "grid size-10 place-items-center rounded-full bg-white/15 text-white",
+                "grid size-9 sm:size-10 place-items-center rounded-full bg-white/15 text-white",
                 "transition-[background-color,color,transform] duration-200 motion-reduce:transition-none",
                 "hover:bg-flag-yellow hover:text-flag-black active:scale-95",
               )}

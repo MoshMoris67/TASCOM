@@ -39,7 +39,7 @@ function Article() {
         description={post.excerpt}
         image={post.cover_url ?? photos.campusAvenue}
         imageAlt=""
-        crumbs={[{ label: "Media", to: "/media" }, { label: post.tag }]}
+        crumbs={[{ label: "Student Life", to: "/student-life" }, { label: post.tag }]}
         tone="ink"
         layout="banner"
       />
@@ -68,7 +68,7 @@ function Article() {
             </div>
 
             <Link
-              to="/media"
+              to="/student-life"
               hash="news"
               className="mt-12 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-flag-red hover:text-flag-red"
             >

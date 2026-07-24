@@ -1,11 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 /**
- * /events was folded into /media. The events listing now lives on the media
- * page at the `#events` anchor. Redirect at the router before anything renders.
+ * /events was folded into Student Life. The listing lives at
+ * /student-life#events, inside the News & Events section. Redirect at the
+ * router before anything renders.
  */
 export const Route = createFileRoute("/events")({
   beforeLoad: () => {
-    throw redirect({ to: "/media", hash: "events", replace: true });
+    throw redirect({ to: "/student-life", hash: "events", replace: true });
   },
 });

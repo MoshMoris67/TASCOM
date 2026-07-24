@@ -1,26 +1,61 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero, Section } from "@/components/layout/PageHero";
 import { CardGrid } from "@/components/motion";
-import { BookOpen, Bus, Cpu, Music, Trophy, Users } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  BookOpen,
+  Calendar,
+  Cpu,
+  ExternalLink,
+  Image,
+  Music,
+  Trophy,
+  Users,
+  Video,
+} from "lucide-react";
 import sports from "@/assets/sports.jpg";
 import culture from "@/assets/culture.jpg";
 import scienceLab from "@/assets/science-lab.jpg";
 import classroom from "@/assets/classroom.jpg";
+import { photos } from "@/lib/photos";
+import { GalleryPreview } from "@/components/gallery/Gallery";
+import { VideoGrid } from "@/components/media/VideoGrid";
+import { EventCard, MiniCalendar } from "@/components/events/EventsCalendar";
+import { fetchNews, type NewsPost } from "@/lib/news";
+import { fetchMedia, fetchVideos } from "@/lib/media";
+import { fetchUpcomingEvents, type UpcomingEvent } from "@/lib/events";
 
+/**
+ * Student Life absorbed the old /media page.
+ *
+ * Section order matches the navigation: clubs, sports, news & events, gallery.
+ * The events calendar is no longer a destination of its own -- it sits inside
+ * the news section but keeps its `#events` anchor, so every link that pointed
+ * at `/media#events` still lands in the right place after the redirect.
+ */
 export const Route = createFileRoute("/student-life")({
+  loader: async () => ({
+    posts: await fetchNews(6),
+    media: await fetchMedia(),
+    upcoming: await fetchUpcomingEvents(10),
+    videos: await fetchVideos(),
+  }),
   head: () => ({
     meta: [
-      { title: "Student Life — Talents College Mukono" },
+      { title: "Student Life \u2014 Talents College Mukono" },
       {
         name: "description",
         content:
-          "Clubs, sports, music dance & drama, ICT, library, trips and student leadership at Talents College, Mukono.",
+          "Clubs, sports, music dance & drama, ICT, library, student leadership, school news, events, photo gallery and videos from Talents College, Mukono.",
       },
-      { property: "og:title", content: "Student Life — Talents College Mukono" },
+      { property: "og:title", content: "Student Life \u2014 Talents College Mukono" },
       {
         property: "og:description",
-        content: "Explore clubs, sports, arts, ICT and leadership at Talents College Mukono.",
+        content:
+          "Clubs, sports, arts, leadership, news, events, gallery and videos at Talents College Mukono.",
       },
+      { property: "og:image", content: photos.campusAvenue },
     ],
   }),
   component: StudentLife,
@@ -77,7 +112,36 @@ const leadership = [
   "Time Keepers & Health",
 ];
 
+/**
+ * The three shortcut cards carried over from the media page. All three now
+ * point somewhere -- Videos used to be a dead card reading "Coming soon"
+ * because nothing on the public site read the video rows the admin form has
+ * always written.
+ */
+const shortcuts = [
+  {
+    label: "Events",
+    icon: Calendar,
+    description: "Term dates, parents' meetings, galas and cultural evenings \u2014 all on one page.",
+    hash: "events" as const,
+  },
+  {
+    label: "Gallery",
+    icon: Image,
+    description: "Photo highlights from campus life and school events.",
+    hash: "gallery" as const,
+  },
+  {
+    label: "Videos",
+    icon: Video,
+    description: "Watch Talents College in motion through our video stories.",
+    hash: "videos" as const,
+  },
+];
+
 function StudentLife() {
+  const { posts, media, upcoming, videos } = Route.useLoaderData();
+
   return (
     <>
       <PageHero
@@ -154,21 +218,180 @@ function StudentLife() {
         </CardGrid>
       </Section>
 
-      <Section id="trips" className="!pt-0">
-        <div className="rounded-3xl bg-flag-yellow text-flag-black p-8 md:p-12 grid md:grid-cols-[auto_1fr_auto] gap-6 items-center">
-          <div className="size-16 grid place-items-center rounded-2xl bg-flag-black text-flag-yellow">
-            <Bus className="size-7" />
+      <Section id="news">
+        <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">
+          News &amp; events
+        </div>
+        <h2 className="mt-2 font-display font-black text-3xl md:text-4xl">
+          What&apos;s happening at Talents.
+        </h2>
+
+        <CardGrid className="mt-8 grid gap-6 lg:grid-cols-3" tilt>
+          {shortcuts.map((card) => (
+            <Link
+              key={card.label}
+              to="/student-life"
+              hash={card.hash}
+              className="rounded-3xl border border-border bg-card p-8 transition-all hover:border-flag-red"
+            >
+              <div className="inline-flex items-center justify-center rounded-3xl bg-flag-yellow p-4 text-flag-black">
+                <card.icon className="size-6" />
+              </div>
+              <h3 className="mt-6 font-display text-2xl font-bold">{card.label}</h3>
+              <p className="mt-3 text-muted-foreground">{card.description}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-flag-red">
+                Open <ArrowRight className="size-4" />
+              </span>
+            </Link>
+          ))}
+        </CardGrid>
+
+        <div className="mt-12 grid gap-10 lg:grid-cols-3">
+          <CardGrid className="lg:col-span-2 space-y-6">
+            {posts.map((post: NewsPost) => (
+              <article
+                key={post.slug}
+                className="rounded-3xl border border-border bg-card p-8 transition-all hover:border-flag-red"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+                  <span className="rounded-full bg-flag-red/10 px-3 py-1 font-semibold text-flag-red">
+                    {post.tag}
+                  </span>
+                  <span>{new Date(post.published_at).toDateString()}</span>
+                </div>
+                <h3 className="mt-4 font-display text-2xl font-black">
+                  <Link
+                    to="/news/$slug"
+                    params={{ slug: post.slug }}
+                    className="transition-colors hover:text-flag-red"
+                  >
+                    {post.title}
+                  </Link>
+                </h3>
+                <p className="mt-4 text-muted-foreground">{post.excerpt}</p>
+                <Link
+                  to="/news/$slug"
+                  params={{ slug: post.slug }}
+                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-flag-red transition-all hover:gap-2.5"
+                >
+                  Read more <ArrowRight className="size-4" />
+                </Link>
+              </article>
+            ))}
+          </CardGrid>
+
+          <aside className="space-y-6">
+            <div className="rounded-3xl border border-border bg-card p-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-flag-yellow px-4 py-2 text-sm font-semibold text-flag-black">
+                <Bell className="size-4" /> Latest updates
+              </div>
+              <p className="mt-4 text-muted-foreground">
+                Subscribe to stay informed about school events, awards, and alumni activities.
+              </p>
+              <Link
+                to="/contact"
+                className="mt-6 inline-flex items-center justify-center rounded-full bg-flag-red px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-flag-yellow hover:text-flag-black"
+              >
+                Join newsletter
+              </Link>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-card p-8">
+              <div className="inline-flex items-center justify-center rounded-3xl bg-flag-yellow p-3 text-flag-black">
+                <Calendar className="size-6" />
+              </div>
+              <h3 className="mt-5 font-display text-2xl font-bold">Academic Calendar</h3>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                Key term dates, visiting days, mock exams and extra-curricular events for the
+                current academic year. Download the booklet or browse the list.
+              </p>
+              <div className="mt-6 flex flex-col gap-3">
+                <Link
+                  to="/student-life"
+                  hash="events"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-flag-red px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-flag-yellow hover:text-flag-black"
+                >
+                  View full calendar
+                </Link>
+                <a
+                  href="/documents/academic-calendar-2026.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold transition-colors hover:border-flag-red hover:text-flag-red"
+                >
+                  Download PDF <ExternalLink className="size-3.5" />
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-card p-6">
+              <div className="text-xs uppercase tracking-widest text-flag-red font-semibold mb-4">
+                This month at a glance
+              </div>
+              <MiniCalendar events={upcoming} />
+            </div>
+          </aside>
+        </div>
+
+        {/*
+          Keeps the `#events` id the old media page used, so `/media#events`,
+          `/events` and every existing link still resolve to the calendar even
+          though it is no longer a destination of its own.
+        */}
+        <div id="events" className="mt-16 scroll-mt-24 md:scroll-mt-28">
+          <div className="text-xs uppercase tracking-widest text-flag-red font-semibold">
+            Upcoming events
           </div>
+          <h3 className="mt-2 font-display font-black text-3xl md:text-4xl">On the calendar.</h3>
+          <div className="mt-8">
+            {upcoming.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No published events right now.</p>
+            ) : (
+              <div className="space-y-4">
+                {upcoming.map((ev: UpcomingEvent, i: number) => (
+                  <EventCard key={ev.id} event={ev} index={i} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </Section>
+
+      {/* A preview, not the whole library — the full set lives at /gallery. */}
+      <Section id="gallery" className="!pt-0">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-widest font-semibold">School trips</div>
-            <h3 className="mt-1 font-display font-black text-2xl md:text-3xl">
-              Learning that travels.
-            </h3>
-            <p className="mt-2 max-w-2xl opacity-85">
-              Each year students take educational tours to Kampala industries, national parks,
-              research institutions and heritage sites — bringing classroom subjects to life.
-            </p>
+            <div className="text-xs font-semibold uppercase tracking-widest text-flag-red">
+              Latest highlights
+            </div>
+            <h2 className="mt-3 font-display text-3xl font-black md:text-4xl">
+              Events, awards and campus moments.
+            </h2>
           </div>
+          <Link
+            to="/gallery"
+            className="inline-flex shrink-0 items-center gap-2.5 rounded-full bg-flag-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-flag-red"
+          >
+            <Image className="size-4" /> Browse the full gallery
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+
+        <div className="mt-8">
+          <GalleryPreview photos={media.slice(0, 8)} />
+        </div>
+      </Section>
+
+      <Section id="videos" className="!pt-0">
+        <div className="text-xs font-semibold uppercase tracking-widest text-flag-red">Videos</div>
+        <h2 className="mt-3 font-display text-3xl font-black md:text-4xl">
+          Talents College in motion.
+        </h2>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Assemblies, sports days, MDD festival performances and campus tours.
+        </p>
+        <div className="mt-8">
+          <VideoGrid videos={videos} />
         </div>
       </Section>
     </>

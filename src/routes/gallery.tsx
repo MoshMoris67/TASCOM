@@ -48,7 +48,7 @@ function GalleryPage() {
         description="Classrooms and laboratories, sport and cultural performance, assemblies and visiting days. Filter by what you want to see, then tap any photo to open it."
         image={photos.girlsPose}
         imageAlt="Students on the campus walkway at Talents College Mukono"
-        crumbs={[{ label: "Media", to: "/media" }, { label: "Gallery" }]}
+        crumbs={[{ label: "Student Life", to: "/student-life" }, { label: "Gallery" }]}
         tone="cream"
         layout="split"
       />

@@ -14,7 +14,6 @@ const SUGGESTIONS = [
 
 const LINK_PATHS = [
   "/apply",
-  "/media",
   "/academics",
   "/contact",
   "/admissions",
@@ -40,7 +39,11 @@ function linkify(text: string): ReactNode[] {
       // Earliest match wins; on a tie the LONGER path wins, otherwise
       // "/admissions/check-status" would be linked as "/admissions" with a
       // dangling "/check-status" left as plain text.
-      if (earliest === -1 || idx < earliest || (idx === earliest && p.length > matchedPath.length)) {
+      if (
+        earliest === -1 ||
+        idx < earliest ||
+        (idx === earliest && p.length > matchedPath.length)
+      ) {
         earliest = idx;
         matchedPath = p;
       }
@@ -96,6 +99,16 @@ export function AIChatPanel({ onClose }: { onClose: () => void }) {
     inputRef.current?.focus();
   }, []);
 
+  // A second way out. The toggle button sits underneath the panel on short
+  // viewports, so the X should not be the only route to closing it.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   useEffect(() => {
     listRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
@@ -145,8 +158,26 @@ export function AIChatPanel({ onClose }: { onClose: () => void }) {
   if (!open) return null;
 
   return (
-    <div className="fixed bottom-24 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[380px] max-h-[520px] flex flex-col rounded-3xl border border-border bg-background shadow-elegant overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-gradient-to-r from-flag-red via-flag-red to-[#c0392b] text-white relative overflow-hidden">
+    <div
+      className={cn(
+        "fixed bottom-24 right-5 z-[60] w-[calc(100vw-2.5rem)] sm:w-[380px]",
+        "flex flex-col rounded-3xl border border-border bg-background shadow-elegant overflow-hidden",
+      )}
+      /*
+        `max-h-[520px]` was a fixed number in a viewport whose height changes
+        with zoom and window size. The panel's top edge lands at
+        `viewportHeight - 96px - panelHeight`, so once the viewport dropped
+        below ~616px the panel grew up into the header and took its own close
+        button with it. Capping against the measured header height means it
+        shortens instead of climbing.
+      */
+      style={{
+        maxHeight: "min(520px, calc(100dvh - var(--site-header-h, 8rem) - 7.5rem))",
+      }}
+      role="dialog"
+      aria-label="TASCOM AI Assistant"
+    >
+      <div className="flex shrink-0 items-center justify-between px-5 py-4 border-b border-border bg-gradient-to-r from-flag-red via-flag-red to-[#c0392b] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_50%,var(--flag-yellow),transparent_60%)]" />
         <div className="flex items-center gap-3 relative z-10">
           <span className="relative grid size-9 place-items-center rounded-xl bg-white/15 backdrop-blur-sm text-white">
@@ -168,7 +199,7 @@ export function AIChatPanel({ onClose }: { onClose: () => void }) {
         </button>
       </div>
 
-      <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto p-4 space-y-3">
         {history.length === 0 && (
           <div className="text-center py-6">
             <div className="inline-flex size-12 place-items-center rounded-full bg-flag-black text-flag-yellow mb-3">
@@ -224,7 +255,7 @@ export function AIChatPanel({ onClose }: { onClose: () => void }) {
       </div>
 
       <form
-        className="flex items-center gap-2 border-t border-border bg-card/50 p-3"
+        className="flex shrink-0 items-center gap-2 border-t border-border bg-card/50 p-3"
         onSubmit={(e) => {
           e.preventDefault();
           send();

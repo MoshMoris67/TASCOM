@@ -50,6 +50,7 @@
   --color-sky: var(--flag-blue);
   --color-flag-black: var(--flag-black);
   --color-flag-yellow: var(--flag-yellow);
+  --color-flag-warm: var(--flag-warm);
   --color-flag-red: var(--flag-red);
   --color-flag-blue: var(--flag-blue);
 
@@ -63,6 +64,7 @@
   --radius: 0.75rem;
 
   /* Legacy names now map to: navy / cream / blue / sky */
+  --flag-warm: #eebc2a;   /* yellow end of the header gradient */
   --flag-black: oklch(0.22 0.06 258);   /* deep navy */
   --flag-yellow: oklch(0.95 0.025 85);  /* warm cream */
   --flag-red: oklch(0.52 0.18 252);     /* vibrant blue */

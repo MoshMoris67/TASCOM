@@ -105,12 +105,12 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/media" hash="events" className="text-white/70 hover:text-flag-yellow">
+              <Link to="/student-life" hash="events" className="text-white/70 hover:text-flag-yellow">
                 Events Calendar
               </Link>
             </li>
             <li>
-              <Link to="/media" hash="gallery" className="text-white/70 hover:text-flag-yellow">
+              <Link to="/student-life" hash="gallery" className="text-white/70 hover:text-flag-yellow">
                 Gallery
               </Link>
             </li>

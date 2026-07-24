@@ -174,8 +174,9 @@ function Home() {
               Est. 2002 · Mukono, Uganda
             </div>
             <h1 className="mt-5 font-display font-black text-4xl sm:text-5xl md:text-7xl leading-[1.02]">
+              TALENTS COLLEGE MUKONO.<br />
               <span className="text-flag-yellow">
-                NURTURING STUDENTS AND SHAPING FUTURES THROUGH THE POWER OF KNOWLEDGE.
+              POWER OF KNOWLEDGE.
               </span>
             </h1>
             <p className="mt-5 text-base md:text-lg text-white/85 max-w-xl">
@@ -417,7 +418,7 @@ function Home() {
             <EventCountdown events={upcoming} />
           </div>
           <Link
-            to="/media"
+            to="/student-life"
             hash="events"
             className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-flag-red hover:underline"
           >
