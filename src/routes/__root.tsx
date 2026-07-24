@@ -16,6 +16,7 @@ import { Footer } from "@/components/layout/Footer";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { ScrollProgress } from "@/components/motion";
 import { Toaster } from "sonner";
+import { NewsNotifier } from "@/components/notifications/NewsNotifier";
 
 function NotFoundComponent() {
   return (
@@ -139,6 +140,7 @@ function RootComponent() {
           <Footer />
         </div>
         <FloatingActions />
+        <NewsNotifier />
         <Toaster position="top-center" richColors closeButton />
       </ThemeProvider>
     </QueryClientProvider>

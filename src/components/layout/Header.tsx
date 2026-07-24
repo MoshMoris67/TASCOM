@@ -1,9 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, X, Phone, ChevronDown } from "lucide-react";
+import { Menu, Moon, Sun, X, Phone, ChevronDown, Bell } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { fetchLatestNews, type NewsPost } from "@/lib/news";
 import { school } from "@/lib/school-info";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import crest from "@/assets/crest.png";
 
 type MenuItem = {
@@ -87,17 +90,26 @@ const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
   const [mobileDropdownIndex, setMobileDropdownIndex] = useState<number | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [indicator, setIndicator] = useState({ left: 0, width: 0, visible: false });
+  const [newsOpen, setNewsOpen] = useState(false);
+  const [newsItems, setNewsItems] = useState<NewsPost[]>([]);
 
   const { theme, toggle } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const headerRef = useRef<HTMLElement | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
+  const loadLatestNews = useServerFn(fetchLatestNews);
+
+  useEffect(() => {
+    if (!newsOpen) return;
+    loadLatestNews()
+      .then(setNewsItems)
+      .catch(() => setNewsItems([]));
+  }, [newsOpen, loadLatestNews]);
 
   const activeIndex = activeIndexFor(pathname);
 
@@ -136,14 +148,7 @@ export function Header() {
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [measure, scrolled]);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [measure]);
 
   useEffect(() => {
     setOpen(false);
@@ -171,9 +176,13 @@ export function Header() {
     };
   }, []);
 
+  // The whole block sticks, contact strip included, so nothing scrolls out of
+  // reach. `position` is also set inline: `sticky` and `relative` are the same
+  // utility group, and whichever Tailwind emits last wins regardless of the
+  // order they're written in the class string. The inline rule can't be lost
+  // that way.
   return (
-    <>
-      {/* Top strip — scrolls away, leaving the glass bar alone at the top. */}
+    <div className="sticky top-0 z-50" style={{ position: "sticky", top: 0 }}>
       <div className="hidden md:block bg-flag-black text-white text-xs">
         <div className="container-page flex items-center justify-between py-2">
           <div className="flex items-center gap-4 opacity-80">
@@ -194,37 +203,27 @@ export function Header() {
           headerRef.current = el;
         }}
         className={cn(
-          // `sticky` is itself a positioned element, so it anchors the ::before
-          // below. Don't add `relative` here — they're the same utility group and
-          // which one wins depends on stylesheet order, not the order written.
-          "sticky top-0 z-50",
-          "transition-[background-color,box-shadow,border-color,backdrop-filter] duration-500 ease-out",
-          "motion-reduce:transition-none",
-          // Hairline highlight along the top edge — reads as a glass lip. Declared
-          // unconditionally so only the opacity animates; toggling `before:absolute`
-          // would leave a stray static box on the non-scrolled state.
-          "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px",
-          "before:bg-white/50 before:content-[''] dark:before:bg-white/10",
-          "before:transition-opacity before:duration-500 motion-reduce:before:transition-none",
-          // Glass: translucency + blur + saturation. Saturation is what stops the
-          // colour behind the bar going grey and flat once it's blurred.
-          scrolled
-            ? [
-                "bg-background/65 backdrop-blur-xl backdrop-saturate-150",
-                "border-b border-border/70",
-                "shadow-[0_10px_30px_-14px_rgb(0_0_0/0.28)]",
-                "before:opacity-100",
-              ]
-            : [
-                "bg-background/40 backdrop-blur-sm border-b border-transparent shadow-none before:opacity-0",
-              ],
+          // Same treatment as the AI chat panel header: brand gradient left to
+          // right, warm radial bloom over it, white type on top.
+          "relative bg-gradient-to-r from-flag-red via-flag-red to-[#c0392b] text-white",
+          "border-b border-white/15",
+          "shadow-[0_10px_30px_-14px_rgb(0_0_0/0.45)]",
+          "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/25 before:content-['']",
         )}
       >
+        {/*
+          The bloom is clipped by its own layer. `overflow-hidden` on the header
+          itself would also clip the desktop dropdowns, which are positioned at
+          `top-full` — i.e. entirely outside the header's box.
+        */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_50%,var(--flag-yellow),transparent_60%)]" />
+          <div className="absolute -top-40 -right-24 size-[500px] rounded-full opacity-[0.10] bg-[radial-gradient(circle_at_center,var(--flag-yellow),transparent_70%)]" />
+        </div>
         <div
           className={cn(
-            "container-page flex items-center justify-between gap-6 xl:gap-10",
-            "transition-[height] duration-500 ease-out motion-reduce:transition-none",
-            scrolled ? "h-16" : "h-20 md:h-24",
+            "container-page relative z-10 flex items-center justify-between gap-6 xl:gap-10",
+            "h-20 md:h-24",
           )}
         >
           <Link to="/" className="group flex shrink-0 items-center gap-4">
@@ -237,7 +236,7 @@ export function Header() {
                 "w-auto shrink-0 rounded-lg bg-white p-0.5 object-contain drop-shadow-sm",
                 "transition-[height,transform] duration-500 ease-out motion-reduce:transition-none",
                 "group-hover:scale-105",
-                scrolled ? "h-10 md:h-11" : "h-11 md:h-14",
+                "h-11 md:h-14",
               )}
             />
             {/*
@@ -250,9 +249,7 @@ export function Header() {
             <div className="block leading-tight">
               <div
                 className={cn(
-                  "font-display font-bold tracking-tight transition-[font-size] duration-500 ease-out",
-                  "motion-reduce:transition-none",
-                  scrolled ? "text-[0.9rem] md:text-base" : "text-[0.95rem] md:text-lg",
+                  "font-display font-bold tracking-tight text-[0.95rem] md:text-lg",
                 )}
               >
                 TALENTS COLLEGE MUKONO
@@ -260,9 +257,7 @@ export function Header() {
               {/* Collapses away on scroll — part of the shrink, not a separate trick. */}
               <div
                 className={cn(
-                  "overflow-hidden text-[10px] uppercase tracking-[0.18em] text-muted-foreground md:text-[11px]",
-                  "transition-all duration-500 ease-out motion-reduce:transition-none",
-                  scrolled ? "max-h-0 opacity-0" : "max-h-5 opacity-100",
+                  "text-[10px] uppercase tracking-[0.18em] text-white/75 md:text-[11px]",
                 )}
               >
                 Power of Knowledge
@@ -296,8 +291,8 @@ export function Header() {
                 transitionTimingFunction: EASE,
               }}
             >
-              <span className="absolute inset-0 rounded-full bg-foreground/[0.07]" />
-              <span className="absolute -bottom-1.5 left-1/2 h-[3px] w-5 -translate-x-1/2 rounded-full bg-flag-red" />
+              <span className="absolute inset-0 rounded-full bg-white/15" />
+              <span className="absolute -bottom-1.5 left-1/2 h-[3px] w-5 -translate-x-1/2 rounded-full bg-flag-yellow" />
             </span>
 
             {menuItems.map((item, index) => {
@@ -306,8 +301,8 @@ export function Header() {
                 "relative z-10 whitespace-nowrap rounded-full px-3.5 py-2",
                 "text-[13px] tracking-tight transition-colors duration-200 motion-reduce:transition-none",
                 isActive
-                  ? "font-bold text-flag-red"
-                  : "font-semibold text-foreground/80 hover:text-foreground",
+                  ? "font-bold text-flag-yellow"
+                  : "font-semibold text-white/85 hover:text-white",
               );
 
               if (item.submenu) {
@@ -389,12 +384,56 @@ export function Header() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2.5">
+            <Popover open={newsOpen} onOpenChange={setNewsOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Notifications"
+                  className={cn(
+                    "grid size-10 place-items-center rounded-full bg-white/15 text-white relative",
+                    "transition-[background-color,color,transform] duration-200 motion-reduce:transition-none",
+                    "hover:bg-flag-yellow hover:text-flag-black active:scale-95",
+                  )}
+                >
+                  <Bell className="size-5" />
+                  {newsItems.length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-flag-yellow text-[10px] font-bold text-flag-black ring-2 ring-[#c0392b]">
+                      {newsItems.length}
+                    </span>
+                  )}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 max-h-96 overflow-y-auto" align="end">
+                <div className="text-xs font-semibold uppercase tracking-widest text-flag-red mb-3">
+                  Latest news
+                </div>
+                <div className="space-y-3">
+                  {newsItems.map((item) => (
+                    <Link
+                      key={item.slug}
+                      to="/news/$slug"
+                      params={{ slug: item.slug }}
+                      className="block rounded-xl border border-border bg-card p-3 transition-colors hover:border-flag-red"
+                      onClick={() => setNewsOpen(false)}
+                    >
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(item.published_at).toDateString()}
+                      </div>
+                      <div className="mt-1 text-sm font-semibold leading-snug">{item.title}</div>
+                    </Link>
+                  ))}
+                  {newsItems.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">No news yet.</p>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
             <button
               type="button"
               onClick={toggle}
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               className={cn(
-                "grid size-10 place-items-center rounded-full bg-muted text-foreground",
+                "grid size-10 place-items-center rounded-full bg-white/15 text-white",
                 "transition-[background-color,color,transform] duration-200 motion-reduce:transition-none",
                 "hover:bg-flag-yellow hover:text-flag-black active:scale-95",
               )}
@@ -405,11 +444,9 @@ export function Header() {
               to="/admissions"
               hash="apply"
               className={cn(
-                "hidden items-center whitespace-nowrap rounded-full bg-flag-red px-4 text-[13px] font-semibold text-white lg:inline-flex",
-                "transition-[height,background-color,color,box-shadow,transform] duration-300 ease-out",
-                "motion-reduce:transition-none",
-                "shadow-sm hover:bg-flag-yellow hover:text-flag-black hover:shadow-md active:scale-95",
-                scrolled ? "h-9" : "h-10",
+                "hidden items-center whitespace-nowrap rounded-full bg-flag-yellow px-4 text-[13px] font-bold text-flag-black lg:inline-flex",
+                "shadow-sm transition-[transform,background-color] duration-200 hover:bg-white active:scale-95 motion-reduce:transition-none",
+                "h-10",
               )}
             >
               Apply Now
@@ -417,7 +454,7 @@ export function Header() {
             <button
               type="button"
               className={cn(
-                "grid size-10 place-items-center rounded-full bg-muted lg:hidden",
+                "grid size-10 place-items-center rounded-full bg-white/15 text-white lg:hidden",
                 "transition-[background-color,color] duration-200 motion-reduce:transition-none",
                 "hover:bg-flag-yellow hover:text-flag-black",
               )}
@@ -433,7 +470,7 @@ export function Header() {
         {/* Mobile nav */}
         <div
           className={cn(
-            "overflow-hidden border-t border-border transition-all duration-300 ease-out lg:hidden",
+            "relative z-10 overflow-hidden border-t border-white/15 transition-all duration-300 ease-out lg:hidden",
             "motion-reduce:transition-none",
             open ? "max-h-[1000px] opacity-100" : "max-h-0 border-t-0 opacity-0",
           )}
@@ -450,11 +487,11 @@ export function Header() {
                         setMobileDropdownIndex(mobileDropdownIndex === index ? null : index)
                       }
                       className={cn(
-                        "flex w-full items-center justify-between rounded-2xl border bg-card px-4 py-3 text-left text-base font-semibold",
+                        "flex w-full items-center justify-between rounded-2xl border bg-white/10 px-4 py-3 text-left text-base font-semibold",
                         "transition-colors duration-200 motion-reduce:transition-none",
                         isActive
-                          ? "border-flag-red/50 text-flag-red"
-                          : "border-border text-foreground hover:border-flag-red/40",
+                          ? "border-flag-yellow/70 text-flag-yellow"
+                          : "border-white/20 text-white hover:border-flag-yellow/50",
                       )}
                     >
                       <span>{item.label}</span>
@@ -470,11 +507,11 @@ export function Header() {
                       to={item.to}
                       aria-current={isActive ? "page" : undefined}
                       className={cn(
-                        "flex w-full items-center rounded-2xl border bg-card px-4 py-3 text-base font-semibold",
+                        "flex w-full items-center rounded-2xl border bg-white/10 px-4 py-3 text-base font-semibold",
                         "transition-colors duration-200 motion-reduce:transition-none",
                         isActive
-                          ? "border-flag-red/50 text-flag-red"
-                          : "border-border text-foreground hover:border-flag-red/40",
+                          ? "border-flag-yellow/70 text-flag-yellow"
+                          : "border-white/20 text-white hover:border-flag-yellow/50",
                       )}
                     >
                       {item.label}
@@ -496,7 +533,7 @@ export function Header() {
                             key={sub.label}
                             to={sub.to}
                             hash={sub.hash}
-                            className="block rounded-2xl px-4 py-2 text-sm text-foreground/80 transition-colors hover:bg-muted hover:text-foreground motion-reduce:transition-none"
+                            className="block rounded-2xl px-4 py-2 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white motion-reduce:transition-none"
                           >
                             {sub.label}
                           </Link>
@@ -511,15 +548,15 @@ export function Header() {
             <Link
               to="/admissions"
               hash="apply"
-              className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-flag-red text-sm font-semibold text-white transition-colors hover:bg-flag-yellow hover:text-flag-black motion-reduce:transition-none"
+              className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-flag-yellow text-sm font-bold text-flag-black transition-colors hover:bg-white motion-reduce:transition-none"
             >
               Apply Now
             </Link>
           </nav>
         </div>
 
-        <div className="h-1 flag-stripe" />
+        <div className="relative z-10 h-1 flag-stripe" />
       </header>
-    </>
+    </div>
   );
 }

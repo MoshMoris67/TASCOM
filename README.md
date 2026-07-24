@@ -53,6 +53,14 @@ cp .env.example .env
 | `SUPABASE_URL`                  | Same as `VITE_SUPABASE_URL` (server-side)   |
 | `SUPABASE_PUBLISHABLE_KEY`      | Same as `VITE_SUPABASE_PUBLISHABLE_KEY`      |
 | `SUPABASE_PROJECT_ID`           | Same as `VITE_SUPABASE_PROJECT_ID`           |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service-role key (server-side only) |
+| `OPENAI_API_KEY`                | (Optional) OpenAI key for the AI assistant   |
+| `ANTHROPIC_API_KEY`             | (Optional) Anthropic key for the AI assistant |
+| `STUDENT_SESSION_SECRET`        | Secret for signing student portal sessions   |
+
+> At least one of `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` enables the chat widget.
+> Set only one — the assistant picks whichever is present.
+> Never put either key in a `VITE_*` variable; they are read **server-side only**.
 
 > The publishable/anon key is safe to expose client-side. Never put a Supabase
 > **service-role** key in a `VITE_*` variable.

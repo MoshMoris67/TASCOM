@@ -25,14 +25,17 @@ import { Route as AcademicsRouteImport } from './routes/academics'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as ApplyIndexRouteImport } from './routes/apply.index'
 import { Route as AdmissionsIndexRouteImport } from './routes/admissions.index'
+import { Route as PortalStudentRouteImport } from './routes/portal.student'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as ApplySuccessRouteImport } from './routes/apply.success'
 import { Route as AdmissionsCheckStatusRouteImport } from './routes/admissions.check-status'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as PortalStudentLoginRouteImport } from './routes/portal.student_.login'
 import { Route as AuthenticatedAdminNewsRouteImport } from './routes/_authenticated/admin.news'
 import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated/admin.messages'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin.media'
@@ -119,6 +122,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
 const NewsIndexRoute = NewsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -133,6 +141,11 @@ const AdmissionsIndexRoute = AdmissionsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdmissionsRoute,
+} as any)
+const PortalStudentRoute = PortalStudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => PortalRoute,
 } as any)
 const NewsSlugRoute = NewsSlugRouteImport.update({
   id: '/$slug',
@@ -158,6 +171,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const PortalStudentLoginRoute = PortalStudentLoginRouteImport.update({
+  id: '/student_/login',
+  path: '/student/login',
+  getParentRoute: () => PortalRoute,
 } as any)
 const AuthenticatedAdminNewsRoute = AuthenticatedAdminNewsRouteImport.update({
   id: '/news',
@@ -207,22 +225,25 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/media': typeof MediaRoute
   '/news': typeof NewsRouteWithChildren
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/staff': typeof StaffRoute
   '/student-life': typeof StudentLifeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admissions/check-status': typeof AdmissionsCheckStatusRoute
   '/apply/success': typeof ApplySuccessRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/portal/student': typeof PortalStudentRoute
   '/admissions/': typeof AdmissionsIndexRoute
   '/apply/': typeof ApplyIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/news': typeof AuthenticatedAdminNewsRoute
+  '/portal/student/login': typeof PortalStudentLoginRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -235,21 +256,23 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/gallery': typeof GalleryRoute
   '/media': typeof MediaRoute
-  '/portal': typeof PortalRoute
   '/staff': typeof StaffRoute
   '/student-life': typeof StudentLifeRoute
   '/admissions/check-status': typeof AdmissionsCheckStatusRoute
   '/apply/success': typeof ApplySuccessRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/portal/student': typeof PortalStudentRoute
   '/admissions': typeof AdmissionsIndexRoute
   '/apply': typeof ApplyIndexRoute
   '/news': typeof NewsIndexRoute
+  '/portal': typeof PortalIndexRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/news': typeof AuthenticatedAdminNewsRoute
+  '/portal/student/login': typeof PortalStudentLoginRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -267,22 +290,25 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/media': typeof MediaRoute
   '/news': typeof NewsRouteWithChildren
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/staff': typeof StaffRoute
   '/student-life': typeof StudentLifeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admissions/check-status': typeof AdmissionsCheckStatusRoute
   '/apply/success': typeof ApplySuccessRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/portal/student': typeof PortalStudentRoute
   '/admissions/': typeof AdmissionsIndexRoute
   '/apply/': typeof ApplyIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
   '/_authenticated/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
   '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/_authenticated/admin/news': typeof AuthenticatedAdminNewsRoute
+  '/portal/student_/login': typeof PortalStudentLoginRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -307,15 +333,18 @@ export interface FileRouteTypes {
     | '/admissions/check-status'
     | '/apply/success'
     | '/news/$slug'
+    | '/portal/student'
     | '/admissions/'
     | '/apply/'
     | '/news/'
+    | '/portal/'
     | '/admin/applications'
     | '/admin/events'
     | '/admin/inquiries'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/news'
+    | '/portal/student/login'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -328,21 +357,23 @@ export interface FileRouteTypes {
     | '/events'
     | '/gallery'
     | '/media'
-    | '/portal'
     | '/staff'
     | '/student-life'
     | '/admissions/check-status'
     | '/apply/success'
     | '/news/$slug'
+    | '/portal/student'
     | '/admissions'
     | '/apply'
     | '/news'
+    | '/portal'
     | '/admin/applications'
     | '/admin/events'
     | '/admin/inquiries'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/news'
+    | '/portal/student/login'
     | '/admin'
   id:
     | '__root__'
@@ -366,15 +397,18 @@ export interface FileRouteTypes {
     | '/admissions/check-status'
     | '/apply/success'
     | '/news/$slug'
+    | '/portal/student'
     | '/admissions/'
     | '/apply/'
     | '/news/'
+    | '/portal/'
     | '/_authenticated/admin/applications'
     | '/_authenticated/admin/events'
     | '/_authenticated/admin/inquiries'
     | '/_authenticated/admin/media'
     | '/_authenticated/admin/messages'
     | '/_authenticated/admin/news'
+    | '/portal/student_/login'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -392,7 +426,7 @@ export interface RootRouteChildren {
   GalleryRoute: typeof GalleryRoute
   MediaRoute: typeof MediaRoute
   NewsRoute: typeof NewsRouteWithChildren
-  PortalRoute: typeof PortalRoute
+  PortalRoute: typeof PortalRouteWithChildren
   StaffRoute: typeof StaffRoute
   StudentLifeRoute: typeof StudentLifeRoute
 }
@@ -511,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/news/': {
       id: '/news/'
       path: '/'
@@ -531,6 +572,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admissions/'
       preLoaderRoute: typeof AdmissionsIndexRouteImport
       parentRoute: typeof AdmissionsRoute
+    }
+    '/portal/student': {
+      id: '/portal/student'
+      path: '/student'
+      fullPath: '/portal/student'
+      preLoaderRoute: typeof PortalStudentRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/news/$slug': {
       id: '/news/$slug'
@@ -566,6 +614,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/portal/student_/login': {
+      id: '/portal/student_/login'
+      path: '/student/login'
+      fullPath: '/portal/student/login'
+      preLoaderRoute: typeof PortalStudentLoginRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/_authenticated/admin/news': {
       id: '/_authenticated/admin/news'
@@ -684,6 +739,21 @@ const NewsRouteChildren: NewsRouteChildren = {
 
 const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 
+interface PortalRouteChildren {
+  PortalStudentRoute: typeof PortalStudentRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+  PortalStudentLoginRoute: typeof PortalStudentLoginRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalStudentRoute: PortalStudentRoute,
+  PortalIndexRoute: PortalIndexRoute,
+  PortalStudentLoginRoute: PortalStudentLoginRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -698,7 +768,7 @@ const rootRouteChildren: RootRouteChildren = {
   GalleryRoute: GalleryRoute,
   MediaRoute: MediaRoute,
   NewsRoute: NewsRouteWithChildren,
-  PortalRoute: PortalRoute,
+  PortalRoute: PortalRouteWithChildren,
   StaffRoute: StaffRoute,
   StudentLifeRoute: StudentLifeRoute,
 }

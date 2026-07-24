@@ -1,3 +1,4 @@
+import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -95,3 +96,24 @@ export async function fetchPost(slug: string): Promise<NewsPost | null> {
   }
   return fallbackPosts.find((p) => p.slug === slug) ?? null;
 }
+
+export const fetchLatestPost = createServerFn().handler(async () => {
+  const posts = await fetchNews(1);
+  return posts[0] ?? null;
+});
+
+export const fetchLatestNews = createServerFn().handler(async () => {
+  return await fetchNews(5);
+});
+
+/**
+ * The rotation feed for the on-site notifier.
+ *
+ * Deliberately returns the whole recent set rather than just the newest one:
+ * the notifier cycles through these in order, so it needs every item, not a
+ * single "latest". Capped at 20 so an old archive can't turn into an endless
+ * carousel.
+ */
+export const fetchNewsFeed = createServerFn().handler(async () => {
+  return await fetchNews(20);
+});

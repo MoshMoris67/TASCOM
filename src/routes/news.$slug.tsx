@@ -60,9 +60,9 @@ function Article() {
             <div className="mt-6 space-y-5 text-lg leading-relaxed text-muted-foreground">
               {post.body
                 .split(/\n{2,}/)
-                .map((para) => para.trim())
+                .map((para: string) => para.trim())
                 .filter(Boolean)
-                .map((para, i) => (
+                .map((para: string, i: number) => (
                   <p key={i}>{para}</p>
                 ))}
             </div>

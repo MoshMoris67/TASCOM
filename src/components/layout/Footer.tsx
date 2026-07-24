@@ -1,6 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Lock, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  Youtube,
+  GraduationCap,
+} from "lucide-react";
 import { navLinks, school } from "@/lib/school-info";
+import { cn } from "@/lib/utils";
 import crest from "@/assets/crest.png";
 
 const TikTok = (props: React.SVGProps<SVGSVGElement>) => (
@@ -28,7 +38,7 @@ export function Footer() {
               alt="Talents College crest"
               className="h-16 w-auto rounded-lg bg-white p-1.5 object-contain"
             />
-        <div>
+            <div>
               <div className="font-display font-bold text-lg text-white leading-tight">
                 Talents College Mukono
               </div>
@@ -79,13 +89,14 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/portal" className="text-white/70 hover:text-flag-yellow">
+              <Link
+                to="/portal/student/login"
+                className="text-white/70 hover:text-flag-yellow inline-flex items-center gap-2"
+              >
+                <span className="grid size-5 place-items-center rounded bg-white/10">
+                  <GraduationCap className="size-3" />
+                </span>
                 Student Portal
-              </Link>
-            </li>
-            <li>
-              <Link to="/portal" className="text-white/70 hover:text-flag-yellow">
-                Parents Portal
               </Link>
             </li>
             <li>
